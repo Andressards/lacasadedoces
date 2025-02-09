@@ -1,6 +1,9 @@
 * {
     font-family: 'Roboto';
     background-color: #0000;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
 }
 
 body {
@@ -225,3 +228,42 @@ footer {
 footer p {
     margin-bottom: 0;
 }
+
+
+/* Catálogo */
+
+/* Título */
+.titulo {
+    text-align: center; /* Centraliza o título */
+    margin-top: 20px; /* Espaço do topo */
+    margin-bottom: 40px; /* Espaço abaixo do título */
+    font-family: 'Poppins', sans-serif;
+    color: #9a4f2f;
+}
+
+/* Container do catálogo */
+.catalogo-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 20px; /* Espaço entre os cards */
+    margin-bottom: 40px; /* Espaço final após os cards */
+}
+
+/* Cards de produto */
+.produto-card {
+    background-color: #a3e5ff;
+    color: #000000;
+    padding: 20px;
+    border-radius: 10px;
+    width: 250px; /* Largura fixa para os cards */
+    text-align: center;
+    box-shadow: 0 4px 8px rgba(255, 215, 0, 0.3);
+    transition: transform 0.3s ease-in-out;
+}
+
+.produto-card img {
+    max-width: 100%; /* Garante que a imagem ocupe toda a largura do card */
+    height: auto;
+}
+

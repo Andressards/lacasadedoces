@@ -29,13 +29,13 @@
             </a>
             <ul class="navbar-nav ms-auto">
                 <li class="nav-item">
-                    <a href="/consultas/dashboard_relatorio" class="nav-link">Produtos</a>
+                    <a href="/catalogo" class="nav-link">Produtos</a>
                 </li>
                 <li class="nav-item">
                     <a href="/consultas/dashboard_relatorio" class="nav-link">Pedidos Abertos</a>
                 </li>
                 <li class="nav-item">
-                    <a href="/consultas/grid_cadastro_membro" class="nav-link">Cadastrar Produtos</a>
+                    <a href="/produtos/create" class="nav-link">Cadastrar Produtos</a>
                 </li>
                 <li class="nav-item">
                     <form action="/logout" method="POST">

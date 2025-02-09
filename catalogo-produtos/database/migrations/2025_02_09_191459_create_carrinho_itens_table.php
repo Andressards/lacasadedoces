@@ -17,6 +17,8 @@ class CreateCarrinhoItensTable extends Migration
             $table->id();
             $table->foreignId('produto_id')->constrained('produtos')->onDelete('cascade');
             $table->integer('quantidade')->default(1);
+            $table->unsignedBigInteger('usuario_id'); // Adiciona a coluna usuario_id
+            $table->foreign('usuario_id')->references('id')->on('users'); // Define a chave estrangeira se houver relacionamento com a tabela users
             $table->string('session_id'); // Para usuários não logados
             $table->timestamps();
         });

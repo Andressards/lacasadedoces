@@ -13,12 +13,12 @@ class CreateProdutosTable extends Migration
      */
     public function up()
     {
-        Schema::create('pedidos', function (Blueprint $table) {
+        Schema::create('produtos', function (Blueprint $table) {
             $table->id();
-            $table->string('cliente_nome');
-            $table->string('cliente_whatsapp');
-            $table->decimal('total', 10, 2);
-            $table->enum('status', ['pendente', 'enviado', 'cancelado'])->default('pendente');
+            $table->string('nome');
+            $table->text('descricao')->nullable();
+            $table->decimal('preco', 8, 2);
+            $table->string('imagem')->nullable();
             $table->timestamps();
         });
     }

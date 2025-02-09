@@ -13,6 +13,7 @@ class CreatePedidosTable extends Migration
      */
     public function up()
     {
+        Schema::dropIfExists('pedidos'); // Adicione esta linha
         Schema::create('pedidos', function (Blueprint $table) {
             $table->id();
             $table->string('cliente');
@@ -22,6 +23,7 @@ class CreatePedidosTable extends Migration
             $table->timestamps();
         });
     }
+
 
     /**
      * Reverse the migrations.

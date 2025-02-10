@@ -1,0 +1,402 @@
+* {
+    font-family: 'Roboto';
+    background-color: #0000;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    padding-top: 70px; /* Espaço para o header fixo */
+    background-color: #fdecff; /* Cor de fundo azul para o restante da tela */
+}
+
+/* Header fixo com fundo branco */
+header {
+    position: fixed;
+    top: 0;
+    width: 100%;
+    background-color: #fdecff; /* Cor de fundo branca para o header */
+    border-bottom: 1px solid #9a4f2f;
+    z-index: 1000; /* Para garantir que fique acima de outros conteúdos */
+    padding: 10px;
+}
+
+/* navbar */
+
+#navbar img {
+    width: 40px;
+    padding: 0px;
+}
+
+#navbar {
+    justify-content: space-between;
+    background-color: #fdecff;
+    padding: 0px 0;
+}
+
+#navbar a {
+    font-size: 14px;
+    color: #9a4f2f;
+}
+
+#navbar a:hover {
+    color: #4e2710;
+}
+
+/* Catálogo */
+
+/* Título */
+.titulo {
+    text-align: center; /* Centraliza o título */
+    margin-top: 20px; /* Espaço do topo */
+    margin-bottom: 40px; /* Espaço abaixo do título */
+    font-family: 'Poppins', sans-serif;
+    color: #9a4f2f;
+}
+
+/* Container do catálogo */
+.catalogo-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 20px; /* Espaço entre os cards */
+    margin-bottom: 40px; /* Espaço final após os cards */
+}
+
+/* Cards de produto */
+.produto-card {
+    background-color: #a3e5ff;
+    color: #000000;
+    padding: 20px;
+    border-radius: 10px;
+    width: 250px; /* Largura fixa para os cards */
+    text-align: center;
+    box-shadow: 0 4px 8px #9a4f2f;
+    transition: transform 0.3s ease-in-out;
+    display: flex;
+    flex-direction: column;
+}
+
+.produto-card h4 {
+    padding: 8px;
+}
+
+.produto-imagem {
+    width: 100%; /* Largura total do card */
+    height: 150px; /* Altura fixa para todas as imagens */
+    object-fit: cover; /* Mantém a proporção e corta o excesso */
+    border-radius: 8px; /* Deixa os cantos levemente arredondados */
+}
+
+
+.btn-info {
+   background-color: #9a4f2f;
+   color: #fff;
+   
+}
+
+.produto-card .btn {
+    margin-top: auto; /* Empurra o botão para o final do card */
+}
+
+.produto-card:hover {
+    transform: scale(1.05);
+    box-shadow: 0 6px 12px #9a4f2f; /* Sombra mais intensa */
+}
+
+.catalogo-header {
+    position: relative; /* Mantém os elementos dentro de um mesmo contexto */
+    width: 100%;
+    text-align: center; /* Mantém o título sempre centralizado */
+    padding: 20px;
+}
+
+.titulo {
+    display: block; /* Garante que o título ocupe o centro sozinho */
+    margin: 0 auto; /* Mantém centralizado */
+}
+
+.filtro-container {
+    position: absolute;
+    top: 50%;
+    right: 20px;
+    transform: translateY(-50%);
+}
+
+.form-busca {
+    display: flex;
+    align-items: center;
+    background: #fff; /* Fundo branco para destacar */
+    padding: 5px;
+    border-radius: 8px;
+    box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.2);
+}
+
+.form-busca input {
+    border: none;
+    outline: none;
+    padding: 8px 12px;
+    font-size: 16px;
+    border-radius: 8px;
+    background: transparent;
+    color: #333;
+    width: 180px;
+}
+
+.form-busca input::placeholder {
+    color: #888;
+}
+
+.form-busca button, .inicio-texto button {
+    background-color: #8B4513; /* Marrom para combinar com os botões */
+    color: #fff;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: 0.3s ease-in-out;
+}
+
+.form-busca button:hover {
+    background-color: #6A2E0F; /* Tom mais escuro ao passar o mouse */
+}
+
+/* footer */
+
+footer {
+    text-align: center;
+    background-color: #9a4f2f;
+    color: #fff;
+    padding: 15px;
+    position: relative;
+    width: 100%;
+}
+
+footer p {
+    margin-bottom: 0;
+}
+
+
+/* Estilização para a seção Sobre a Empresa */
+#empresa-section {
+    background-color: #d1e4f8; /* Cor suave de fundo */
+    padding: 40px 20px;
+}
+
+/* Estilizando o container da empresa */
+.empresa {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 30px;
+}
+
+/* Títulos */
+.empresa h1 {
+    font-size: 2rem;
+    font-weight: bold;
+    color: #9a4f2f;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+/* Missão, Visão e Valores */
+.empresa-sobre, .empresa-missao, .empresa-visao, .empresa-valores {
+    background-color: #fdecff; /* Tom de amarelo suave */
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* Itens de lista de valores */
+.empresa-valores ul {
+    list-style-type: none;
+    padding-left: 0;
+}
+
+.empresa-valores li {
+    font-size: 1rem;
+    color: #555;
+    margin-bottom: 15px;
+}
+
+.empresa-valores strong {
+    color: #9a4f2f; /* Cor de destaque */
+}
+
+/* Responsividade */
+@media (min-width: 768px) {
+    .empresa {
+        grid-template-columns: 1fr 1fr;
+        gap: 40px;
+    }
+
+    .empresa-sobre, .empresa-missao, .empresa-visao, .empresa-valores {
+        padding: 30px;
+    }
+}
+
+@media (min-width: 1024px) {
+    .empresa {
+        grid-template-columns: 1fr 1fr 1fr 1fr;
+    }
+}
+
+#contato-section {
+    background-color: #e3f2fd; /* Azul pastel */
+    padding: 50px 0;
+    text-align: center;
+}
+
+.titulo h3 {
+    font-size: 2rem;
+    color: #6d4c41; /* Marrom pastel */
+    margin-bottom: 20px;
+}
+
+.contato-info p {
+    font-size: 1.2rem;
+    color: #4d4d4d; /* Preto suave */
+    margin-bottom: 20px;
+}
+
+.contato-info ul {
+    list-style: none;
+    padding: 0;
+}
+
+.contato-info li {
+    font-size: 1.2rem;
+    color: #6d4c41; /* Marrom pastel */
+    margin: 10px 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+
+.contato-info li a {
+    text-decoration: none;
+    color: inherit;
+    transition: 0.3s ease-in-out;
+}
+
+.contato-info li a:hover {
+    color: #ff80ab; /* Rosa pastel */
+}
+
+.contato-info ion-icon {
+    font-size: 1.5rem;
+    color: #6d4c41; /* Marrom pastel */
+}
+
+.redes-sociais {
+    margin-top: 20px;
+}
+
+.redes-sociais a {
+    text-decoration: none;
+    margin: 0 10px;
+    font-size: 1.8rem;
+    color: #6d4c41; /* Marrom pastel */
+    transition: 0.3s ease-in-out;
+}
+
+.redes-sociais a:hover {
+    color: #ff80ab; /* Rosa pastel */
+}
+
+
+.carrossel {
+    width:100%; /* Ajuste conforme necessário */
+    max-width: 400px; /* Defina um tamanho fixo para o carrossel */
+    overflow: hidden; /* Esconde as imagens que ficam fora da área visível */
+    position: relative;
+}
+
+.carrossel-imagens {
+    display: flex;
+    animation: slide 12s infinite; /* A animação vai durar 12 segundos e será infinita */
+}
+
+.carrossel-imagens img {
+    width: 100%; /* Cada imagem ocupa 100% do espaço visível */
+    height: auto;
+    flex-shrink: 0; /* Impede que as imagens encolham */
+    transition: transform 1s ease-in-out; /* Suaviza a transição da imagem */
+}
+
+@keyframes slide {
+    0% {
+        transform: translateX(0); /* Primeira imagem visível */
+    }
+    25% {
+        transform: translateX(-100%); /* Segunda imagem visível */
+    }
+    50% {
+        transform: translateX(-200%); /* Terceira imagem visível */
+    }
+    75% {
+        transform: translateX(-300%); /* Quarta imagem visível */
+    }
+    100% {
+        transform: translateX(0); /* Retorna para a primeira imagem */
+    }
+}
+
+.inicio-carrossel {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background-color: #d1e4f8;
+    padding: 40px;
+    gap: 20px; /* Adiciona espaçamento entre os cards */
+}
+
+.inicio-texto {
+    background-color: transparent; /* Remove a caixa colorida */
+    color: #000000; /* Texto branco para contraste */
+    text-align: center;
+    padding: 40px;
+}
+
+.inicio-texto h1 {
+    font-size: 66px;
+    font-family: 'Poppins', sans-serif;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: #9a4f2f; /* Amarelo para dar destaque */
+}
+
+.inicio-texto p {
+    font-size: 22px;
+    font-family: 'Roboto', sans-serif;
+    font-weight: 300;
+    line-height: 1.5;
+}
+
+
+.categoria {
+    margin-bottom: 30px;
+}
+
+.categoria-titulo {
+    font-size: 1.8rem;
+    color: #6d4c41; /* Marrom pastel */
+    margin-bottom: 15px;
+    text-align: left; /* Alinha o título à esquerda */
+    padding-left: 20px; /* Mantém o alinhamento com os produtos */
+}
+
+
+.catalogo-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    justify-content: flex-start; /* Alinha os cards à esquerda */
+    padding-left: 20px; /* Espaço para não colar na borda */
+}

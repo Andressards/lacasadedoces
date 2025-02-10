@@ -1,39 +1,49 @@
 <?php
+
 namespace App\Http\Controllers;
 
 use App\Models\Produtos;
 use App\Models\ItemCarrinho;
+use App\Models\Categoria;
 use Illuminate\Http\Request;
 
 class CatalogoController extends Controller
 {
     public function adicionarCarrinho(Request $request)
     {
-        // Validação do produto e recebendo os dados
+        // Validação dos dados recebidos
+        $request->validate([
+            'produto_id' => 'required|exists:produtos,id',
+            'quantidade' => 'required|integer|min:1',
+        ]);
+
         $produtoId = $request->produto_id;
         $quantidade = $request->quantidade;
-        $produto = Produtos::find($produtoId);
+        $produto = Produtos::findOrFail($produtoId);
 
-        // Verifica se o produto existe
-        if (!$produto) {
-            return redirect()->route('catalogo.index')->with('error', 'Produto não encontrado!');
+        // Verifica se o usuário está autenticado
+        if (!auth()->check()) {
+            return redirect()->route('login')->with('error', 'Você precisa estar logado para adicionar ao carrinho.');
         }
 
-        // Adiciona o item ao carrinho do usuário
+        // Adiciona o item ao carrinho do usuário autenticado
         ItemCarrinho::create([
-            // 'usuario_id' => auth()->id(),  // Usando o ID do usuário logado
+            'usuario_id' => auth()->id(),
             'produto_id' => $produto->id,
             'quantidade' => $quantidade,
         ]);
 
-        // Redireciona de volta para a página de detalhes com uma mensagem de sucesso
         return redirect()->route('catalogo.show', $produtoId)->with('success', 'Produto adicionado ao carrinho!');
     }
 
     public function exibirCarrinho()
     {
         // Recupera os itens do carrinho do usuário logado
-        $itensCarrinho = ItemCarrinho::where('usuario_id', auth()->id())->get();
+        if (!auth()->check()) {
+            return redirect()->route('login')->with('error', 'Faça login para ver seu carrinho.');
+        }
+
+        $itensCarrinho = ItemCarrinho::where('usuario_id', auth()->id())->with('produto')->get();
 
         return view('catalogo.carrinho', compact('itensCarrinho'));
     }
@@ -41,9 +51,8 @@ class CatalogoController extends Controller
     public function show($id)
     {
         // Buscar o produto pelo ID
-        $produto = Produtos::findOrFail($id);
+        $produto = Produtos::with('categoria')->findOrFail($id);
 
-        // Retornar a view com os dados do produto
         return view('catalogo.show', compact('produto'));
     }
 
@@ -51,11 +60,13 @@ class CatalogoController extends Controller
     {
         $search = $request->input('search');
 
-        $produtos = Produtos::when($search, function ($query, $search) {
-            return $query->where('nome', 'like', "%{$search}%");
-        })->get();
+        // Obtendo todas as categorias com seus produtos
+        $categorias = Categoria::with(['produtos' => function ($query) use ($search) {
+            if ($search) {
+                $query->where('nome', 'like', "%{$search}%");
+            }
+        }])->get();
 
-        return view('catalogo.index', compact('produtos'));
+        return view('catalogo.index', compact('categorias', 'search'));
     }
-
 }

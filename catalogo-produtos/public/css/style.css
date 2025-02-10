@@ -11,7 +11,7 @@ body {
     flex-direction: column;
     min-height: 100vh;
     padding-top: 70px; /* Espaço para o header fixo */
-    background-color: #fcdbff; /* Cor de fundo azul para o restante da tela */
+    background-color: #fdecff; /* Cor de fundo azul para o restante da tela */
 }
 
 /* Header fixo com fundo branco */
@@ -19,7 +19,7 @@ header {
     position: fixed;
     top: 0;
     width: 100%;
-    background-color: #fcdbff; /* Cor de fundo branca para o header */
+    background-color: #fdecff; /* Cor de fundo branca para o header */
     border-bottom: 1px solid #9a4f2f;
     z-index: 1000; /* Para garantir que fique acima de outros conteúdos */
     padding: 10px;
@@ -76,7 +76,7 @@ header {
 
 #navbar {
     justify-content: space-between;
-    background-color: #fcdbff;
+    background-color: #fdecff;
     padding: 0px 0;
 }
 
@@ -86,7 +86,7 @@ header {
 }
 
 #navbar a:hover {
-    color: #727cf4;
+    color: #4e2710;
 }
 
 /* Form */
@@ -100,7 +100,7 @@ header {
     border-radius: 10px;
     margin: 20px auto;
     overflow-y: auto;
-    background: rgb(255, 255, 255); /* Certifique-se de que o fundo do formulário seja branco */
+    background: #F8F9FA ; /* Certifique-se de que o fundo do formulário seja branco */
 }
 
 .header-container {
@@ -258,12 +258,93 @@ footer p {
     border-radius: 10px;
     width: 250px; /* Largura fixa para os cards */
     text-align: center;
-    box-shadow: 0 4px 8px rgba(255, 215, 0, 0.3);
+    box-shadow: 0 4px 8px #9a4f2f;
     transition: transform 0.3s ease-in-out;
+    display: flex;
+    flex-direction: column;
 }
 
-.produto-card img {
-    max-width: 100%; /* Garante que a imagem ocupe toda a largura do card */
-    height: auto;
+.produto-card h4 {
+    padding: 8px;
 }
 
+.produto-imagem {
+    width: 100%; /* Largura total do card */
+    height: 150px; /* Altura fixa para todas as imagens */
+    object-fit: cover; /* Mantém a proporção e corta o excesso */
+    border-radius: 8px; /* Deixa os cantos levemente arredondados */
+}
+
+
+.btn-info {
+   background-color: #9a4f2f;
+   color: #fff;
+   
+}
+
+.produto-card .btn {
+    margin-top: auto; /* Empurra o botão para o final do card */
+}
+
+.produto-card:hover {
+    transform: scale(1.05);
+    box-shadow: 0 6px 12px #9a4f2f; /* Sombra mais intensa */
+}
+
+.catalogo-header {
+    position: relative; /* Mantém os elementos dentro de um mesmo contexto */
+    width: 100%;
+    text-align: center; /* Mantém o título sempre centralizado */
+    padding: 20px;
+}
+
+.titulo {
+    display: block; /* Garante que o título ocupe o centro sozinho */
+    margin: 0 auto; /* Mantém centralizado */
+}
+
+.filtro-container {
+    position: absolute;
+    top: 50%;
+    right: 20px;
+    transform: translateY(-50%);
+}
+
+.form-busca {
+    display: flex;
+    align-items: center;
+    background: #fff; /* Fundo branco para destacar */
+    padding: 5px;
+    border-radius: 8px;
+    box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.2);
+}
+
+.form-busca input {
+    border: none;
+    outline: none;
+    padding: 8px 12px;
+    font-size: 16px;
+    border-radius: 8px;
+    background: transparent;
+    color: #333;
+    width: 180px;
+}
+
+.form-busca input::placeholder {
+    color: #888;
+}
+
+.form-busca button {
+    background-color: #8B4513; /* Marrom para combinar com os botões */
+    color: #fff;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: 0.3s ease-in-out;
+}
+
+.form-busca button:hover {
+    background-color: #6A2E0F; /* Tom mais escuro ao passar o mouse */
+}

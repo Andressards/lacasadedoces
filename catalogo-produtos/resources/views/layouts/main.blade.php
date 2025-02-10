@@ -32,10 +32,10 @@
                     <a href="/catalogo" class="nav-link">Produtos</a>
                 </li>
                 <li class="nav-item">
-                    <a href="/consultas/dashboard_relatorio" class="nav-link">Pedidos Abertos</a>
+                    <a href="/categorias" class="nav-link">Cadastrar Categoria</a>
                 </li>
                 <li class="nav-item">
-                    <a href="/produtos/create" class="nav-link">Cadastrar Produtos</a>
+                <a href="/produtos" class="nav-link">Cadastrar Produtos</a>
                 </li>
                 <li class="nav-item">
                     <form action="/logout" method="POST">

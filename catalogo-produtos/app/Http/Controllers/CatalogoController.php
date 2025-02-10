@@ -47,11 +47,15 @@ class CatalogoController extends Controller
         return view('catalogo.show', compact('produto'));
     }
 
-    public function index()
+    public function index(Request $request)
     {
-        // Busque os produtos do banco de dados, por exemplo
-        $produtos = Produtos::all(); // Aqui você pode filtrar ou ordenar os produtos como necessário
+        $search = $request->input('search');
 
-        return view('catalogo.index', compact('produtos')); // Retorne a view com os produtos
+        $produtos = Produtos::when($search, function ($query, $search) {
+            return $query->where('nome', 'like', "%{$search}%");
+        })->get();
+
+        return view('catalogo.index', compact('produtos'));
     }
+
 }

@@ -35,7 +35,7 @@
                     <a href="/categorias" class="nav-link">Cadastrar Categoria</a>
                 </li>
                 <li class="nav-item">
-                <a href="/produtos" class="nav-link">Cadastrar Produtos</a>
+                    <a href="/produtos" class="nav-link">Cadastrar Produtos</a>
                 </li>
                 <li class="nav-item">
                     <form action="/logout" method="POST">
@@ -50,13 +50,15 @@
         </div>
     </nav>
 </header>
+
 <main class="d-flex flex-column">
     <div class="container-fluid flex-grow-1">
         <div class="row">
             @if(session('msg'))
                 <p class="msg">{{ session('msg') }}</p>
             @endif
-            @yield('content')
+
+            @yield('content') <!-- Onde a tela de login será exibida -->
         </div>
     </div>
 </main>

@@ -8,8 +8,14 @@ class ItemCarrinho extends Model
 {
     use HasFactory;
 
-    // Nome da tabela no banco de dados
-    protected $table = 'carrinho_itens'; // Nome correto da tabela
+    // Defina os campos que podem ser preenchidos em massa
+    protected $fillable = ['usuario_id', 'produto_id', 'quantidade'];
 
-    protected $fillable = ['produto_id', 'quantidade', 'preco'];
+    protected $table = 'carrinho_itens';
+
+    public function produto()
+    {
+        return $this->belongsTo(Produtos::class);
+    }
 }
+

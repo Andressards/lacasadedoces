@@ -230,4 +230,30 @@ footer p {
 }
 
 
+/* Adicione isso ao seu arquivo style.css */
+.card {
+    border-radius: 10px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.card-header {
+    border-radius: 10px 10px 0 0;
+}
+
+.card-body {
+    background-color: #f9f9f9;
+}
+
+.btn-primary {
+    background-color: #ff5c8d; /* Cor de fundo personalizada */
+    border: none;
+}
+
+.btn-primary:hover {
+    background-color: #ff3c6e; /* Cor de fundo ao passar o mouse */
+}
+
+.text-danger {
+    font-size: 0.9rem;
+}
 

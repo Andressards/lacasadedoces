@@ -2,20 +2,17 @@
 
 use Illuminate\Support\Facades\Route;
 
-/*
-|--------------------------------------------------------------------------
-| Web Routes
-|--------------------------------------------------------------------------
-|
-| Here is where you can register web routes for your application. These
-| routes are loaded by the RouteServiceProvider within a group which
-| contains the "web" middleware group. Now create something great!
-|
-*/
-
 Route::get('/', function () {
     return view('welcome');
 });
+
+use App\Http\Controllers\AuthController;
+
+Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
+Route::post('/login', [AuthController::class, 'login'])->name('login.submit');
+Route::get('/register', [AuthController::class, 'showRegisterForm'])->name('register');
+Route::post('/register', [AuthController::class, 'register'])->name('register.submit');
+Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
 use App\Http\Controllers\ProdutosController;
 
@@ -27,8 +24,6 @@ Route::put('/produtos/{id}', [ProdutosController::class, 'update'])->name('produ
 Route::get('/produtos', [ProdutosController::class, 'index'])->name('produtos.index');
 Route::get('/produtos/{id}/toggle-status', [ProdutosController::class, 'toggleStatus'])->name('produtos.toggleStatus');
 
-
-// routes/web.php
 use App\Http\Controllers\CatalogoController;
 
 Route::get('/catalogo', [CatalogoController::class, 'index'])->name('catalogo.index');  // Página do catálogo com todos os produtos
@@ -36,6 +31,8 @@ Route::get('/catalogo/{id}', [CatalogoController::class, 'show'])->name('catalog
 Route::post('/catalogo/pedido', [CatalogoController::class, 'storePedido'])->name('catalogo.pedido');  // Formulário de pedido
 Route::post('/catalogo/adicionar-carrinho', [CatalogoController::class, 'adicionarCarrinho'])->name('catalogo.adicionarCarrinho');
 Route::get('/carrinho', [CatalogoController::class, 'exibirCarrinho'])->name('catalogo.carrinho');
+Route::post('/carrinho/atualizar/{id}', [CatalogoController::class, 'atualizarCarrinho'])->name('carrinho.atualizar');  // Atualizar quantidade do item no carrinho
+Route::delete('/carrinho/remover/{id}', [CatalogoController::class, 'removerDoCarrinho'])->name('carrinho.remover');  // Remover item do carrinho
 
 use App\Http\Controllers\CategoriasController;
 

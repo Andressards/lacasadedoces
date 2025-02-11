@@ -23,6 +23,8 @@ class CatalogoController extends Controller
 
         // Verifica se o usuário está autenticado
         if (!auth()->check()) {
+            // Se não estiver logado, redireciona para a página de login
+            // E passa o URL atual como parâmetro para redirecionar o usuário de volta após o login
             return redirect()->route('login')->with('error', 'Você precisa estar logado para adicionar ao carrinho.');
         }
 
@@ -33,8 +35,10 @@ class CatalogoController extends Controller
             'quantidade' => $quantidade,
         ]);
 
+        // Redireciona para a página do produto com uma mensagem de sucesso
         return redirect()->route('catalogo.show', $produtoId)->with('success', 'Produto adicionado ao carrinho!');
     }
+
 
     public function exibirCarrinho()
     {
@@ -69,4 +73,26 @@ class CatalogoController extends Controller
 
         return view('catalogo.index', compact('categorias', 'search'));
     }
+
+    public function atualizarCarrinho(Request $request, $id)
+    {
+        $request->validate([
+            'quantidade' => 'required|integer|min:1',
+        ]);
+
+        $item = ItemCarrinho::where('id', $id)->where('usuario_id', auth()->id())->firstOrFail();
+        $item->update(['quantidade' => $request->quantidade]);
+
+        return back()->with('success', 'Quantidade do produto atualizada!');
+    }
+
+    public function removerDoCarrinho($id)
+    {
+        $item = ItemCarrinho::where('id', $id)->where('usuario_id', auth()->id())->firstOrFail();
+        $item->delete();
+
+        return back()->with('success', 'Item removido do carrinho!');
+    }
+
+
 }

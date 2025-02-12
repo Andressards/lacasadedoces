@@ -43,6 +43,12 @@ Route::put('/categorias/{id}', [CategoriasController::class, 'update'])->name('c
 Route::get('/categorias', [CategoriasController::class, 'index'])->name('categorias.index');
 Route::get('/categorias/{id}/toggleStatus', [CategoriasController::class, 'toggleStatus'])->name('categorias.toggleStatus');
 
+use App\Http\Controllers\PedidoController;
+
+Route::middleware(['auth'])->group(function () {
+    Route::get('/finalizar-pedido', [PedidoController::class, 'formularioPedido'])->name('pedido.formulario');
+    Route::post('/finalizar-pedido', [PedidoController::class, 'salvarPedido'])->name('pedido.salvar');
+});
 
 
 

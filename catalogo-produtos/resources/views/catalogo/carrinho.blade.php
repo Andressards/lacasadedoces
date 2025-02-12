@@ -31,6 +31,11 @@
             <a href="/" class="navbar-brand">
                 <img src="/img/logo_lacasadedoces-removebg-preview.png" alt="lacasadedoces">
             </a>
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item">
+                    <a href="/catalogo" class="nav-link">Catálogo</a>
+                </li>
+            </ul>
             <navbar-brand></navbar-brand>
         </div>
     </nav>
@@ -82,6 +87,7 @@
                     @endforeach
                 </tbody>
             </table>
+            <a href="{{ route('pedido.formulario') }}" class="btn btn-success mt-3">Finalizar Pedido</a>
         @endif
     </div>
 </section>

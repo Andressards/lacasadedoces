@@ -21,23 +21,26 @@ class CatalogoController extends Controller
         $quantidade = $request->quantidade;
         $produto = Produtos::findOrFail($produtoId);
 
+        // Obtém o ID da sessão
+        $sessionId = session()->getId();
+        $usuarioId = auth()->id() ?? null; // Pode ser null para usuários não autenticados
+
         // Verifica se o usuário está autenticado
         if (!auth()->check()) {
-            // Se não estiver logado, redireciona para a página de login
-            // E passa o URL atual como parâmetro para redirecionar o usuário de volta após o login
             return redirect()->route('login')->with('error', 'Você precisa estar logado para adicionar ao carrinho.');
         }
 
-        // Adiciona o item ao carrinho do usuário autenticado
+        // Adiciona o item ao carrinho
         ItemCarrinho::create([
-            'usuario_id' => auth()->id(),
+            'usuario_id' => $usuarioId,
             'produto_id' => $produto->id,
             'quantidade' => $quantidade,
+            'session_id' => $sessionId, // Adicionando o ID da sessão
         ]);
 
-        // Redireciona para a página do produto com uma mensagem de sucesso
         return redirect()->route('catalogo.show', $produtoId)->with('success', 'Produto adicionado ao carrinho!');
     }
+
 
 
     public function exibirCarrinho()

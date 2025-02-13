@@ -45,10 +45,9 @@ Route::get('/categorias/{id}/toggleStatus', [CategoriasController::class, 'toggl
 
 use App\Http\Controllers\PedidoController;
 
-Route::middleware(['auth'])->group(function () {
-    Route::get('/finalizar-pedido', [PedidoController::class, 'formularioPedido'])->name('pedido.formulario');
-    Route::post('/finalizar-pedido', [PedidoController::class, 'salvarPedido'])->name('pedido.salvar');
-});
+Route::get('/finalizar-pedido', [PedidoController::class, 'formularioPedido'])->name('pedido.formulario');
+Route::post('/finalizar-pedido', [PedidoController::class, 'salvarPedido'])->name('pedido.salvar');
+
 
 
 

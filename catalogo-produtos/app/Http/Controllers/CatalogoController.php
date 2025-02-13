@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Models\Produtos;
-use App\Models\ItemCarrinho;
 use App\Models\Categoria;
 use Illuminate\Http\Request;
 
@@ -11,7 +10,6 @@ class CatalogoController extends Controller
 {
     public function adicionarCarrinho(Request $request)
     {
-        // Validação dos dados recebidos
         $request->validate([
             'produto_id' => 'required|exists:produtos,id',
             'quantidade' => 'required|integer|min:1',
@@ -21,39 +19,38 @@ class CatalogoController extends Controller
         $quantidade = $request->quantidade;
         $produto = Produtos::findOrFail($produtoId);
 
-        // Obtém o ID da sessão
-        $sessionId = session()->getId();
-        $usuarioId = auth()->id() ?? null; // Pode ser null para usuários não autenticados
+        // Obtém o carrinho atual da sessão
+        $carrinho = session()->get('carrinho', []);
 
-        // Verifica se o usuário está autenticado
-        if (!auth()->check()) {
-            return redirect()->route('login')->with('error', 'Você precisa estar logado para adicionar ao carrinho.');
+        // Verifica se o produto já está no carrinho
+        if (isset($carrinho[$produtoId])) {
+            $carrinho[$produtoId]['quantidade'] += $quantidade;
+        } else {
+            // Adiciona um novo produto ao carrinho
+            $carrinho[$produtoId] = [
+                'id' => $produto->id,
+                'nome' => $produto->nome,
+                'preco' => $produto->preco,
+                'imagem' => $produto->imagem,
+                'quantidade' => $quantidade
+            ];
         }
 
-        // Adiciona o item ao carrinho
-        ItemCarrinho::create([
-            'usuario_id' => $usuarioId,
-            'produto_id' => $produto->id,
-            'quantidade' => $quantidade,
-            'session_id' => $sessionId, // Adicionando o ID da sessão
-        ]);
+        // Atualiza o carrinho na sessão
+        session()->put('carrinho', $carrinho);
 
         return redirect()->route('catalogo.show', $produtoId)->with('success', 'Produto adicionado ao carrinho!');
     }
 
 
-
     public function exibirCarrinho()
     {
-        // Recupera os itens do carrinho do usuário logado
-        if (!auth()->check()) {
-            return redirect()->route('login')->with('error', 'Faça login para ver seu carrinho.');
-        }
-
-        $itensCarrinho = ItemCarrinho::where('usuario_id', auth()->id())->with('produto')->get();
+        // Obtém os itens do carrinho da sessão (se existirem)
+        $itensCarrinho = session()->get('carrinho', []);
 
         return view('catalogo.carrinho', compact('itensCarrinho'));
     }
+
 
     public function show($id)
     {
@@ -83,19 +80,26 @@ class CatalogoController extends Controller
             'quantidade' => 'required|integer|min:1',
         ]);
 
-        $item = ItemCarrinho::where('id', $id)->where('usuario_id', auth()->id())->firstOrFail();
-        $item->update(['quantidade' => $request->quantidade]);
+        $carrinho = session()->get('carrinho', []);
+
+        if (isset($carrinho[$id])) {
+            $carrinho[$id]['quantidade'] = $request->quantidade;
+            session()->put('carrinho', $carrinho);
+        }
 
         return back()->with('success', 'Quantidade do produto atualizada!');
     }
 
     public function removerDoCarrinho($id)
     {
-        $item = ItemCarrinho::where('id', $id)->where('usuario_id', auth()->id())->firstOrFail();
-        $item->delete();
-
+        $carrinho = session()->get('carrinho', []);
+    
+        if (isset($carrinho[$id])) {
+            unset($carrinho[$id]);
+            session()->put('carrinho', $carrinho);
+        }
+    
         return back()->with('success', 'Item removido do carrinho!');
     }
-
-
+    
 }

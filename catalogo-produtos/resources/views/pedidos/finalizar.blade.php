@@ -21,7 +21,7 @@
         <ul class="list-group mb-3">
             @foreach($itensCarrinho as $item)
                 <li class="list-group-item">
-                    {{ $item->produto->nome }} - Quantidade: {{ $item->quantidade }}
+                    {{ $item['nome'] }} - Quantidade: {{ $item['quantidade'] }}
                 </li>
             @endforeach
         </ul>

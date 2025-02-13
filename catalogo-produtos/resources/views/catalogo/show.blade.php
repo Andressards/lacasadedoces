@@ -65,7 +65,9 @@
                             <input type="number" name="quantidade" id="quantidade" min="1" value="1" required>
                         </div>
                         <div class="d-flex gap-3 mt-4">
-                            <button type="submit" class="btn btn-primary btn-lg">Adicionar ao Carrinho</button>
+                        <button class="btn btn-primary add-to-cart" data-id="{{ $produto->id }}" data-nome="{{ $produto->nome }}" data-preco="{{ $produto->preco }}">
+    Adicionar ao Carrinho
+</button>
                             <a href="/catalogo" class="btn btn-outline-secondary btn-lg">Voltar ao Catálogo</a>
                         </div>
                         @if(session('success'))
@@ -86,3 +88,26 @@
     </div>
 </section>
 
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        document.querySelectorAll('.add-to-cart').forEach(button => {
+            button.addEventListener('click', function() {
+                let produtoId = this.getAttribute('data-id');
+                let nome = this.getAttribute('data-nome');
+                let preco = this.getAttribute('data-preco');
+
+                let carrinho = JSON.parse(localStorage.getItem('carrinho')) || [];
+                
+                let produtoExistente = carrinho.find(produto => produto.id === produtoId);
+                if (produtoExistente) {
+                    produtoExistente.quantidade += 1;
+                } else {
+                    carrinho.push({ id: produtoId, nome, preco, quantidade: 1 });
+                }
+
+                localStorage.setItem('carrinho', JSON.stringify(carrinho));
+                alert('Produto adicionado ao carrinho!');
+            });
+        });
+    });
+</script>

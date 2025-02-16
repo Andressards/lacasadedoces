@@ -29,7 +29,10 @@
             </a>
             <ul class="navbar-nav ms-auto">
                 <li class="nav-item">
-                    <a href="/catalogo" class="nav-link">Voltar ao Site</a>
+                    <a href="/categorias" class="nav-link">Histórico de Pedidos</a>
+                </li>
+                <li class="nav-item">
+                    <a href="/categorias" class="nav-link">Gerenciar Pedidos</a>
                 </li>
                 <li class="nav-item">
                     <a href="/categorias" class="nav-link">Cadastrar Categoria</a>
@@ -42,7 +45,7 @@
                         @csrf
                         <a href="/logout" class="nav-link"
                            onclick="event.preventDefault();
-                           this.closest('form').submit();">Sair</a>
+                           this.closest('form').submit();">Voltar ao Site</a>
                     </form>
                 </li>
             </ul>

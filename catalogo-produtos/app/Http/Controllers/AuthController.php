@@ -22,7 +22,7 @@ class AuthController extends Controller
         $credentials = $request->only('email', 'password');
 
         if (Auth::attempt($credentials)) {
-            return redirect()->intended('/catalogo');
+            return redirect()->intended('/produtos');
         }
 
         return back()->withErrors([
@@ -56,7 +56,7 @@ class AuthController extends Controller
         // Realiza o login após o cadastro
         Auth::login($user);
 
-        return redirect('/catalogo');
+        return redirect('/produtos');
     }
 
     // Logout do usuário

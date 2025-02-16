@@ -39,6 +39,9 @@
                     <a href="/carrinho" class="nav-link">Carrinho</a>
                 </li>
                 <li class="nav-item">
+                    <a href="#empresa-section" class="nav-link">Sobre Nós</a>
+                </li>
+                <li class="nav-item">
                     @if(auth()->check()) <!-- Verifica se o usuário está logado -->
                         <form action="/logout" method="POST" class="d-inline">
                             @csrf
@@ -47,11 +50,8 @@
                                this.closest('form').submit();">Sair</a>
                         </form>
                     @else
-                        <a href="/login" class="nav-link">Entrar</a> <!-- Link para a tela de login -->
+                        <a href="/login" class="nav-link">Painel Administrativo</a> <!-- Link para a tela de login -->
                     @endif
-                </li>
-                <li class="nav-item">
-                    <a href="#empresa-section" class="nav-link">Sobre Nós</a>
                 </li>
             </ul>
         </div>

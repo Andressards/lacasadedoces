@@ -11,6 +11,8 @@ class Categoria extends Model
 
     protected $table = 'categorias'; // Se o nome da tabela for diferente de 'categorias'
 
+    protected $fillable = ['nome']; // Permite que 'nome' seja preenchido via mass assignment
+
     public function produtos()
     {
         return $this->hasMany(Produtos::class, 'categoria_id'); 

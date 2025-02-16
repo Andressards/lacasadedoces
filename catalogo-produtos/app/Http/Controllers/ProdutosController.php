@@ -86,11 +86,16 @@ class ProdutosController extends Controller
     }
 
 
-    public function index()
+    public function index(Request $request)
     {
-        $produtos = Produtos::all();
+        $search = $request->input('search');
+
+        // Busca os produtos pelo nome se houver um termo de pesquisa
+        $produtos = Produtos::where('nome', 'like', "%{$search}%")->get();
+
         return view('produtos.index', compact('produtos'));
     }
+
 
     public function toggleStatus($id)
     {

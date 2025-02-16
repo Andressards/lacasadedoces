@@ -7,6 +7,13 @@
             <a href="{{ route('produtos.produtos_create') }}" class="btn btn-primary">Novo</a>
         </div>
 
+        <div class="filtro-container">
+            <form action="{{ route('produtos.index') }}" method="GET" class="form-busca">
+                <input type="text" name="search" placeholder="Buscar produto..." value="{{ request('search') }}">
+                <button type="submit" class="btn btn-secondary">Buscar</button>
+            </form>
+        </div>
+
         @if(session('msg'))
             <p class="alert alert-success">{{ session('msg') }}</p>
         @endif

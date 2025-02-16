@@ -46,9 +46,15 @@ class CategoriasController extends Controller
         return redirect()->route('categorias.create')->with('msg', 'Categoria atualizada com sucesso!');
     }
 
-    public function index()
+    public function index(Request $request)
     {
         $categorias = Categoria::all();
+
+        $search = $request->input('search');
+
+        // Busca os produtos pelo nome se houver um termo de pesquisa
+        $categorias = Categoria::where('nome', 'like', "%{$search}%")->get();
+
         return view('categorias.index', compact('categorias'));
     }
 

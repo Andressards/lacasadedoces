@@ -29,7 +29,7 @@
             </a>
             <ul class="navbar-nav ms-auto">
                 <li class="nav-item">
-                    <a href="/catalogo" class="nav-link">Produtos</a>
+                    <a href="/catalogo" class="nav-link">Voltar ao Site</a>
                 </li>
                 <li class="nav-item">
                     <a href="/categorias" class="nav-link">Cadastrar Categoria</a>

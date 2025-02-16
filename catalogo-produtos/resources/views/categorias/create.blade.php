@@ -20,6 +20,10 @@
                 <div class="btn-container">
                     <input type="submit" class="btn btn-primary" value="Cadastrar">
                 </div>
+                
+                <div class="btn-container">
+                    <a href="{{ route('categorias.index') }}" class="btn btn-primary">Voltar</a>
+                </div>
             </form>
         </div>
     </div>

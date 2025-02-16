@@ -9,7 +9,6 @@ return new class extends Migration {
     {
         Schema::create('pedidos', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('usuario_id')->constrained('users')->onDelete('cascade');
             $table->string('nome_cliente');
             $table->date('data_entrega');
             $table->json('itens_pedido'); // Guardará os itens do pedido em JSON

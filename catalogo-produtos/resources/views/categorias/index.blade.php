@@ -3,6 +3,9 @@
 @section('content')
     <div class="list-container">
         <h1 class="grid-tipo-entrada-title-container">Lista de Categorias</h1>
+        <div class="btn-container">
+            <a href="{{ route('categorias.create') }}" class="btn btn-primary">Novo</a>
+        </div>
 
         @if(session('msg'))
             <p class="alert alert-success">{{ session('msg') }}</p>
@@ -13,17 +16,16 @@
                 <tr>
                     <th>ID</th>
                     <th>Categoria</th>
-                    <th>Status</th>  <!-- Coluna para o status de Ativo/Inativo -->
+                    <th>Status</th>
                     <th>Ações</th>
                 </tr>
             </thead>
             <tbody>
-                @foreach($categorias as $categoria)  <!-- Corrigir aqui: usar $categoria -->
+                @foreach($categorias as $categoria) 
                     <tr>
                         <td>{{ $categoria->id }}</td>
                         <td>{{ $categoria->nome }}</td>
 
-                        <!-- Coluna Status de Ativo/Inativo -->
                         <td>
                             <a href="{{ route('categorias.toggleStatus', $categoria->id) }}" 
                                class="btn btn-{{ $categoria->ativo ? 'success' : 'danger' }}">

@@ -1,6 +1,4 @@
-<!-- resources/views/auth/login.blade.php -->
-
-@extends('layouts.main') <!-- Inclui o layout base que você forneceu -->
+@extends('layouts.main')
 
 @section('content')
     <div class="container">

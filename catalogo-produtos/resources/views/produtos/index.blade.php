@@ -3,6 +3,9 @@
 @section('content')
     <div class="list-container">
         <h1 class="grid-tipo-entrada-title-container">Lista de Produtos</h1>
+        <div class="btn-container">
+            <a href="{{ route('produtos.produtos_create') }}" class="btn btn-primary">Novo</a>
+        </div>
 
         @if(session('msg'))
             <p class="alert alert-success">{{ session('msg') }}</p>

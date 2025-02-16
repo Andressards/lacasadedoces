@@ -10,9 +10,19 @@ class Pedido extends Model
     use HasFactory;
 
     protected $fillable = [
-        'usuario_id', 'nome_cliente', 'data_entrega', 'itens_pedido'
+        'nome_cliente',
+        'tipo_entrega', // O campo deve estar aqui para permitir a atribuição em massa
+        'data_entrega',
+        'observacao',
+        'rua',
+        'bairro',
+        'numero',
+        'quadra',
+        'lote',
+        'numero_contato',
+        'itens_pedido',
     ];
-
+    
     protected $casts = [
         'itens_pedido' => 'array',
     ];

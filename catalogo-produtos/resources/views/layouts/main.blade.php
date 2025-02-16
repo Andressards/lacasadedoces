@@ -29,10 +29,10 @@
             </a>
             <ul class="navbar-nav ms-auto">
                 <li class="nav-item">
-                    <a href="/categorias" class="nav-link">Histórico de Pedidos</a>
+                    <a href="/pedidos/historico" class="nav-link">Histórico de Pedidos</a>
                 </li>
                 <li class="nav-item">
-                    <a href="/categorias" class="nav-link">Gerenciar Pedidos</a>
+                    <a href="/pedidos/gerenciar" class="nav-link">Gerenciar Pedidos</a>
                 </li>
                 <li class="nav-item">
                     <a href="/categorias" class="nav-link">Cadastrar Categoria</a>

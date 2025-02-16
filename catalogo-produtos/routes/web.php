@@ -49,6 +49,11 @@ use App\Http\Controllers\PedidoController;
 
 Route::get('/finalizar-pedido', [PedidoController::class, 'formularioPedido'])->name('pedido.formulario');
 Route::post('/finalizar-pedido', [PedidoController::class, 'salvarPedido'])->name('pedido.salvar');
+Route::get('/pedidos/{id}/cancelar', [PedidoController::class, 'cancelar'])->name('pedidos.cancelar');
+Route::get('/pedidos/{id}/ativar', [PedidoController::class, 'ativar'])->name('pedidos.ativar');
+Route::get('/pedidos/gerenciar', [PedidoController::class, 'gerenciar'])->name('pedidos.gerenciar');
+Route::get('/pedidos/{id}/editar', [PedidoController::class, 'editar'])->name('pedidos.edit');
+Route::get('/pedidos/historico', [PedidoController::class, 'historico'])->name('pedidos.historico');
 
 
 

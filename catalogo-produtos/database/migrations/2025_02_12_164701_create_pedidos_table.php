@@ -10,7 +10,7 @@ return new class extends Migration {
         Schema::create('pedidos', function (Blueprint $table) {
             $table->id();
             $table->string('nome_cliente');
-            $table->date('data_entrega');
+            $table->dateTime('data_entrega');
             $table->json('itens_pedido'); // Guardará os itens do pedido em JSON
             $table->timestamps();
         });

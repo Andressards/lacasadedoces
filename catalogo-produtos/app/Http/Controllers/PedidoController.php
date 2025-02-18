@@ -38,7 +38,6 @@ class PedidoController extends Controller
             ],
         ]);
 
-        // Validação condicional para entrega
         if ($request->tipo_entrega === 'entrega') {
             $request->validate([
                 'rua' => 'required|string|max:255',
@@ -54,6 +53,11 @@ class PedidoController extends Controller
         if (empty($itensCarrinho)) {
             return redirect()->route('catalogo.carrinho')->with('error', 'Seu carrinho está vazio.');
         }
+
+        // Calcular o total do pedido
+        $totalPedido = collect($itensCarrinho)->sum(function ($item) {
+            return $item['quantidade'] * $item['preco']; // Multiplica preço pela quantidade
+        });
 
         // Mapeia os itens para formato correto
         $itensPedido = collect($itensCarrinho)->map(function ($item) {
@@ -83,30 +87,40 @@ class PedidoController extends Controller
 
         // Montar mensagem para WhatsApp
         $numeroWhatsApp = '5562993847722';
-        $mensagem = "Novo Pedido 🚀\n"
-            . "Cliente: {$pedido->nome_cliente}\n"
+
+        $mensagem = "Pedido Realizado!\n"
+            . "Olá, gostaria de fazer um pedido!\n"
+            . "\nCliente: {$pedido->nome_cliente}\n"
             . "Data de Entrega: {$pedido->data_entrega}\n"
             . "Tipo de Entrega: " . ucfirst($pedido->tipo_entrega) . "\n"
+            . "Total: R$ " . number_format($totalPedido, 2, ',', '.') . "\n"
             . "Itens do Pedido:\n";
 
         foreach ($itensPedido as $item) {
             $mensagem .= "- {$item['produto']} (x{$item['quantidade']})\n";
         }
 
+        if (!empty($pedido->observacao)) {
+            $mensagem .= "\nObservação: {$pedido->observacao}\n";
+        }
+
         // Adicionar endereço se for entrega
         if ($pedido->tipo_entrega === 'entrega') {
-            $mensagem .= "\n📍 Endereço de Entrega:\n";
+            $mensagem .= "\nEndereço de Entrega:\n";
             $mensagem .= "{$pedido->rua}, Nº {$pedido->numero}, Bairro {$pedido->bairro}\n";
             if ($pedido->quadra) $mensagem .= "Quadra: {$pedido->quadra} ";
             if ($pedido->lote) $mensagem .= "Lote: {$pedido->lote} ";
             if ($pedido->cep) $mensagem .= "\nCEP: {$pedido->cep}";
+            $mensagem .= "\n Valor da Entrega: a combinar\n";
+            $mensagem .= "\n Aguardo a confirmação! Obrigado(a).";
         }
 
-        $linkWhatsApp = "https://wa.me/{$numeroWhatsApp}?text=" . urlencode($mensagem);
+        $mensagem = mb_convert_encoding($mensagem, 'UTF-8', 'auto');
+        $linkWhatsApp = "https://wa.me/{$numeroWhatsApp}?text=" . rawurlencode($mensagem);
+
 
         return redirect()->away($linkWhatsApp);
     }
-
 
 
     public function cancelar($id)

@@ -125,6 +125,7 @@ header {
     top: 50%;
     right: 20px;
     transform: translateY(-50%);
+    margin-top: 10px; /* Garante espaçamento abaixo do título */
 }
 
 .form-busca {
@@ -492,3 +493,109 @@ footer p {
 
 
 
+/* Estilo do Navbar */
+.navbar {
+    padding: 10px 20px;
+}
+
+.navbar-brand img {
+    height: 50px;
+}
+
+.navbar-nav .nav-link {
+    font-weight: 500;
+    padding: 10px 15px;
+    font-size: 14px;
+    color: #9a4f2f;
+}
+
+.navbar-nav a:hover {
+    color: #4e2710;
+}
+
+/* Ajustes para o menu hambúrguer */
+.navbar-toggler {
+    border: none;
+}
+
+.navbar-toggler:focus {
+    outline: none;
+    box-shadow: none;
+}
+
+/* Responsivo para telas menores */
+@media (max-width: 768px) {
+    .inicio-carrossel {
+        max-height: 300px; /* Diminui a altura */
+    }
+
+    .carrossel-imagens img {
+        max-height: 250px; /* Reduz a altura das imagens */
+    }
+
+    .inicio-texto {
+        padding: 10px;
+        text-align: center;
+    }
+
+    .inicio-texto h1 {
+        font-size: 18px; /* Reduz tamanho do título */
+    }
+
+    .inicio-texto p {
+        font-size: 14px; /* Reduz tamanho do texto */
+    }
+
+    .inicio-texto .btn {
+        font-size: 14px;
+        padding: 8px 12px;
+    }
+
+    
+    .catalogo-header {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        gap: 15px; /* Espaço entre título e filtro */
+    }
+
+    .filtro-container {
+        position: static; /* Remove o posicionamento absoluto */
+        transform: none; /* Remove a transformação */
+        width: 100%;
+        display: flex;
+        justify-content: center;
+    }
+
+    .form-busca {
+        display: flex;
+        flex-direction: column; /* Input e botão empilhados */
+        align-items: center;
+        gap: 10px;
+        max-width: 300px;
+        width: 100%;
+    }
+
+    .form-busca input,
+    .form-busca button {
+        width: 100%;
+    }
+
+}
+
+/* Ajustes responsivos */
+@media (max-width: 991px) {
+    .navbar-nav {
+        text-align: center;
+        padding: 10px;
+    }
+
+    .navbar-nav .nav-item {
+        margin-bottom: 10px;
+    }
+
+    .navbar-nav .nav-link {
+        padding: 10px;
+        display: block;
+    }
+}

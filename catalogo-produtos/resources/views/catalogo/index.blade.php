@@ -12,6 +12,10 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400..700&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap" rel="stylesheet">
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap JS (necessário para os modais funcionarem) -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
     <!-- CSS Boostrap -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
@@ -26,20 +30,26 @@
 <body>
 
 <header>
-    <nav class="navbar navbar-expand-lg navbar-light">
-        <div class="collapse navbar-collapse" id="navbar">
-            <a href="/" class="navbar-brand">
-                <img src="/img/logo_lacasadedoces-removebg-preview.png" alt="lacasadedoces">
-            </a>
+<nav class="navbar navbar-expand-lg navbar-light">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="/">
+            <img src="/img/logo_lacasadedoces-removebg-preview.png" alt="LaCasaDeDoces">
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav ms-auto">
+                <li class="nav-item"><a class="nav-link" href="#">Home</a></li>
                 <li class="nav-item">
                     <a href="#catalogo-section" class="nav-link">Catálogo</a>
                 </li>
                 <li class="nav-item">
-                    <a href="/carrinho" class="nav-link">Carrinho</a>
-                </li>
-                <li class="nav-item">
                     <a href="#empresa-section" class="nav-link">Sobre Nós</a>
+                </li>
+                <li class="nav-item"><a class="nav-link" href="#contato-section">Contato</a></li>
+                <li class="nav-item">
+                    <a href="/carrinho" class="nav-link">Carrinho</a>
                 </li>
                 <li class="nav-item">
                     @if(auth()->check()) <!-- Verifica se o usuário está logado -->
@@ -55,7 +65,9 @@
                 </li>
             </ul>
         </div>
-    </nav>
+    </div>
+</nav>
+
 </header>
 
 <section id="inicio-section">
@@ -177,6 +189,27 @@
         </div>
     </div>
 </section>
+
+<!-- Modal -->
+<div class="modal fade" id="comoFuncionaModal" tabindex="-1" aria-labelledby="comoFuncionaModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="comoFuncionaModalLabel">Como Funciona o Catálogo?</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>💡 Navegue pelo catálogo e adicione os produtos ao carrinho.</p>
+                <p>📦 Depois, vá até o carrinho para revisar seus itens.</p>
+                <p>📲 Finalize o pedido e envie os detalhes via WhatsApp.</p>
+                <p>✅ Aguarde a confirmação e aproveite seus doces!</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+            </div>
+        </div>
+    </div>
+</div>
 
 
 <footer class="mt-auto">

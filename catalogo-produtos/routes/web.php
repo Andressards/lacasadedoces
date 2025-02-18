@@ -16,6 +16,7 @@ Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
 use App\Http\Controllers\ProdutosController;
 use App\Http\Controllers\CategoriasController;
+use App\Http\Controllers\PedidoController;
 
 Route::middleware(['auth'])->group(function () {
     
@@ -33,7 +34,16 @@ Route::middleware(['auth'])->group(function () {
     Route::put('/categorias/{id}', [CategoriasController::class, 'update'])->name('categorias.update');
     Route::get('/categorias', [CategoriasController::class, 'index'])->name('categorias.index');
     Route::get('/categorias/{id}/toggleStatus', [CategoriasController::class, 'toggleStatus'])->name('categorias.toggleStatus');
+
+    Route::get('/pedidos/{id}/cancelar', [PedidoController::class, 'cancelar'])->name('pedidos.cancelar');
+    Route::get('/pedidos/{id}/ativar', [PedidoController::class, 'ativar'])->name('pedidos.ativar');
+    Route::get('/pedidos/gerenciar', [PedidoController::class, 'gerenciar'])->name('pedidos.gerenciar');
+    Route::get('/pedidos/{id}/editar', [PedidoController::class, 'editar'])->name('pedidos.edit');
+    Route::get('/pedidos/historico', [PedidoController::class, 'historico'])->name('pedidos.historico');
 });
+
+Route::get('/finalizar-pedido', [PedidoController::class, 'formularioPedido'])->name('pedido.formulario');
+Route::post('/finalizar-pedido', [PedidoController::class, 'salvarPedido'])->name('pedido.salvar');
 
 use App\Http\Controllers\CatalogoController;
 
@@ -44,17 +54,3 @@ Route::post('/catalogo/adicionar-carrinho', [CatalogoController::class, 'adicion
 Route::get('/carrinho', [CatalogoController::class, 'exibirCarrinho'])->name('catalogo.carrinho');
 Route::post('/carrinho/atualizar/{id}', [CatalogoController::class, 'atualizarCarrinho'])->name('carrinho.atualizar');  // Atualizar quantidade do item no carrinho
 Route::delete('/carrinho/remover/{id}', [CatalogoController::class, 'removerDoCarrinho'])->name('carrinho.remover');  // Remover item do carrinho
-
-use App\Http\Controllers\PedidoController;
-
-Route::get('/finalizar-pedido', [PedidoController::class, 'formularioPedido'])->name('pedido.formulario');
-Route::post('/finalizar-pedido', [PedidoController::class, 'salvarPedido'])->name('pedido.salvar');
-Route::get('/pedidos/{id}/cancelar', [PedidoController::class, 'cancelar'])->name('pedidos.cancelar');
-Route::get('/pedidos/{id}/ativar', [PedidoController::class, 'ativar'])->name('pedidos.ativar');
-Route::get('/pedidos/gerenciar', [PedidoController::class, 'gerenciar'])->name('pedidos.gerenciar');
-Route::get('/pedidos/{id}/editar', [PedidoController::class, 'editar'])->name('pedidos.edit');
-Route::get('/pedidos/historico', [PedidoController::class, 'historico'])->name('pedidos.historico');
-
-
-
-

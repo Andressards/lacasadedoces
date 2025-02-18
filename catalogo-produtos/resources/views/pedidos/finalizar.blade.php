@@ -26,7 +26,7 @@
 
         <div class="mb-3">
             <label for="obs" class="form-label">Observação</label>
-            <input type="text" name="obs-pedido" id="observacao" class="form-control">
+            <input type="text" name="observacao" id="observacao" class="form-control">
         </div>
 
         <div class="mb-3">

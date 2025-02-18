@@ -32,20 +32,43 @@ header {
     padding: 0px;
 }
 
-#navbar {
-    justify-content: space-between;
-    background-color: #fdecff;
-    padding: 0px 0;
-}
-
-#navbar a {
+.navbar a {
     font-size: 14px;
     color: #9a4f2f;
 }
 
-#navbar a:hover {
+.navbar {
+    padding: 10px 20px;
+    justify-content: space-between;
+    background-color: #fdecff !important;
+    padding: 0px 0;
+}
+
+.navbar-brand img {
+    height: 50px;
+}
+
+.navbar-nav .nav-link {
+    font-weight: 500;
+    padding: 10px 15px;
+    font-size: 14px;
+    color: #9a4f2f;
+}
+
+.navbar-nav a:hover {
     color: #4e2710;
 }
+
+/* Ajustes para o menu hambúrguer */
+.navbar-toggler {
+    border: none;
+}
+
+.navbar-toggler:focus {
+    outline: none;
+    box-shadow: none;
+}
+
 
 /* Catálogo */
 
@@ -92,7 +115,6 @@ header {
     border-radius: 8px; /* Deixa os cantos levemente arredondados */
 }
 
-
 .btn-info {
    background-color: #9a4f2f;
    color: #fff;
@@ -120,6 +142,7 @@ header {
     margin: 0 auto; /* Mantém centralizado */
 }
 
+/* Filtro */
 .filtro-container {
     position: absolute;
     top: 50%;
@@ -166,7 +189,6 @@ header {
 h1 {
     font-family: 'Dancing Script', cursive;
 }
-
 
 .form-busca button:hover {
     background-color: #6A2E0F; /* Tom mais escuro ao passar o mouse */
@@ -234,24 +256,7 @@ footer p {
     color: #9a4f2f; /* Cor de destaque */
 }
 
-/* Responsividade */
-@media (min-width: 768px) {
-    .empresa {
-        grid-template-columns: 1fr 1fr;
-        gap: 40px;
-    }
-
-    .empresa-sobre, .empresa-missao, .empresa-visao, .empresa-valores {
-        padding: 30px;
-    }
-}
-
-@media (min-width: 1024px) {
-    .empresa {
-        grid-template-columns: 1fr 1fr 1fr 1fr;
-    }
-}
-
+/* Contato */
 #contato-section {
     background-color: #e3f2fd; /* Azul pastel */
     padding: 50px 0;
@@ -492,37 +497,6 @@ footer p {
 }
 
 
-
-/* Estilo do Navbar */
-.navbar {
-    padding: 10px 20px;
-}
-
-.navbar-brand img {
-    height: 50px;
-}
-
-.navbar-nav .nav-link {
-    font-weight: 500;
-    padding: 10px 15px;
-    font-size: 14px;
-    color: #9a4f2f;
-}
-
-.navbar-nav a:hover {
-    color: #4e2710;
-}
-
-/* Ajustes para o menu hambúrguer */
-.navbar-toggler {
-    border: none;
-}
-
-.navbar-toggler:focus {
-    outline: none;
-    box-shadow: none;
-}
-
 /* Responsivo para telas menores */
 @media (max-width: 768px) {
     .inicio-carrossel {
@@ -581,6 +555,18 @@ footer p {
         width: 100%;
     }
 
+}
+
+/* Responsividade */
+@media (min-width: 768px) {
+    .empresa {
+        grid-template-columns: 1fr 1fr;
+        gap: 40px;
+    }
+
+    .empresa-sobre, .empresa-missao, .empresa-visao, .empresa-valores {
+        padding: 30px;
+    }
 }
 
 /* Ajustes responsivos */

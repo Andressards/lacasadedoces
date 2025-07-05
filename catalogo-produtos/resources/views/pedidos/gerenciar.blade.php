@@ -4,7 +4,7 @@
     <div class="list-container">
         <h1 class="grid-tipo-entrada-title-container">Gerenciamento de Pedidos</h1>
         <div class="btn-container">
-            <a href="{{ route('pedidos.gerenciar') }}" class="btn btn-primary">Novo</a>
+            <a href="{{ route('pedido.criar') }}" class="btn btn-primary">Novo</a>
         </div>
 
         <div class="filtro-container">

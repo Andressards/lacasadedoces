@@ -40,6 +40,9 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/pedidos/gerenciar', [PedidoController::class, 'gerenciar'])->name('pedidos.gerenciar');
     Route::get('/pedidos/{id}/editar', [PedidoController::class, 'editar'])->name('pedidos.edit');
     Route::get('/pedidos/historico', [PedidoController::class, 'historico'])->name('pedidos.historico');
+    Route::get('/pedidos/criar', [PedidoController::class, 'formularioCriar'])->name('pedido.criar'); // Para exibir o formulário
+Route::post('/pedidos/criar', [PedidoController::class, 'criarPedidos'])->name('pedido.salvar'); // Para salvar os dados
+
 });
 
 Route::get('/finalizar-pedido', [PedidoController::class, 'formularioPedido'])->name('pedido.formulario');

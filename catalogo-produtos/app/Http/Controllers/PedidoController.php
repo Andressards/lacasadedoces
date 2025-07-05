@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Pedido;
+use App\Models\PedidoItem;
 use App\Models\ItemCarrinho;
 use Illuminate\Http\Request;
 
@@ -169,4 +170,36 @@ class PedidoController extends Controller
         // Retornar a view com a lista de pedidos
         return view('pedidos.historico', compact('pedidos'));
     }
+
+    public function criarPedido()
+    {
+        $produtos = ProdutosController::all(); // Busca todos os produtos do banco
+        return view('pedidos.create', compact('produtos'));
+    }
+
+    public function criarPedidos(Request $request)
+    {
+        $pedido = Pedido::create([
+            'nome_cliente' => $request->nome_cliente,
+            'data_entrega' => $request->data_entrega,
+            'numero_contato' => $request->numero_contato,
+            'observacao' => $request->observacao ?? null,
+        ]);
+
+        foreach ($request->itens as $item) {
+            PedidoItem::create([
+                'pedido_id' => $pedido->id,
+                'produto_id' => $item['produto_id'],
+                'quantidade' => $item['quantidade'],
+            ]);
+        }
+
+        return redirect()->route('pedidos.index')->with('success', 'Pedido criado com sucesso!');
+    }
+
+    public function formularioCriar()
+    {
+        return view('pedidos.create');
+    }
+
 }

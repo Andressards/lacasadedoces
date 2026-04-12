@@ -26,6 +26,7 @@
                     <th>Data de registro</th>
                     <th>Data de entrega</th>
                     <th>Status</th>
+                    <th>Concluir</th>
                     <th>Cancelar</th>
                     <th>Editar</th>
                 </tr>
@@ -43,6 +44,13 @@
                             class="btn btn-danger" 
                             onclick="return confirm('Tem certeza que deseja cancelar este pedido?');">
                                 Cancelar
+                            </a>
+                        </td>
+                        <td>
+                            <a href="{{ route('pedidos.finalizar', $pedido->id) }}" 
+                            class="btn btn-success" 
+                            onclick="return confirm('Tem certeza que deseja finalizar este pedido?');">
+                                Finalizar
                             </a>
                         </td>
                         <td>

@@ -145,6 +145,15 @@ class PedidoController extends Controller
         return redirect()->route('pedidos.gerenciar')->with('msg', 'Pedido cancelado com sucesso!');
     }
 
+    public function finalizar($id)
+    {
+        $pedido = Pedido::findOrFail($id);
+        $pedido->status = 'Finalizado'; // Define o status como Finalizado
+        $pedido->save();
+
+        return redirect()->route('pedidos.gerenciar')->with('msg', 'Pedido cancelado com sucesso!');
+    }
+
     public function ativar($id)
     {
         $pedido = Pedido::findOrFail($id);

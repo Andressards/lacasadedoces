@@ -36,6 +36,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/categorias/{id}/toggleStatus', [CategoriasController::class, 'toggleStatus'])->name('categorias.toggleStatus');
 
     Route::get('/pedidos/{id}/cancelar', [PedidoController::class, 'cancelar'])->name('pedidos.cancelar');
+    Route::get('/pedidos/{id}/finalizar', [PedidoController::class, 'finalizar'])->name('pedidos.finalizar');
     Route::get('/pedidos/{id}/ativar', [PedidoController::class, 'ativar'])->name('pedidos.ativar');
     Route::get('/pedidos/gerenciar', [PedidoController::class, 'gerenciar'])->name('pedidos.gerenciar');
     Route::get('/pedidos/{id}/editar', [PedidoController::class, 'editar'])->name('pedidos.edit');

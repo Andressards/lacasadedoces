@@ -15,6 +15,7 @@ class PedidoItem extends Model
         'pedido_id',
         'produto_id',
         'quantidade',
+        'preco_unitario',
     ];
 
     public function pedido()
@@ -24,6 +25,6 @@ class PedidoItem extends Model
 
     public function produto()
     {
-        return $this->belongsTo(Produto::class);
+        return $this->belongsTo(Produtos::class);
     }
 }

@@ -27,7 +27,7 @@
                     <th>Data de entrega</th>
                     <th>Status</th>
                     <th>Cancelar</th>
-                    <th>Editar></th>
+                    <th>Editar</th>
                 </tr>
             </thead>
             <tbody>

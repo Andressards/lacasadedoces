@@ -82,7 +82,18 @@ class PedidoController extends Controller
             'lote' => $request->lote,
             'numero_contato' => $request->numero_contato,
             'itens_pedido' => $itensPedido,
+            'status' => 'pendente',
         ]);
+
+        // Criar os itens do pedido na tabela pedido_itens
+        foreach ($itensCarrinho as $item) {
+            PedidoItem::create([
+                'pedido_id' => $pedido->id,
+                'produto_id' => $item['id'],
+                'quantidade' => $item['quantidade'],
+                'preco_unitario' => $item['preco'], 
+            ]);
+        }
 
         // Limpar o carrinho da sessão após finalizar pedido
         session()->forget('carrinho');
@@ -188,13 +199,16 @@ class PedidoController extends Controller
             'data_entrega' => $request->data_entrega,
             'numero_contato' => $request->numero_contato,
             'observacao' => $request->observacao ?? null,
+            'status' => 'pendente',
         ]);
 
         foreach ($request->itens as $item) {
+            $produto = Produtos::find($item['produto_id']);
             PedidoItem::create([
                 'pedido_id' => $pedido->id,
                 'produto_id' => $item['produto_id'],
                 'quantidade' => $item['quantidade'],
+                'preco_unitario' => $produto->preco,
             ]);
         }
 
@@ -258,10 +272,12 @@ class PedidoController extends Controller
                 $idsEnviados[] = $item['id'];
             } else {
                 // Criar novo item
+                $produto = Produtos::find($item['produto_id']);
                 $novoItem = PedidoItem::create([
                     'pedido_id' => $pedido->id,
                     'produto_id' => $item['produto_id'],
                     'quantidade' => $item['quantidade'],
+                    'preco_unitario' => $produto->preco,
                 ]);
                 $idsEnviados[] = $novoItem->id;
             }

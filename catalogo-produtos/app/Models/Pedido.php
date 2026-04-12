@@ -21,6 +21,7 @@ class Pedido extends Model
         'lote',
         'numero_contato',
         'itens_pedido',
+        'status',
     ];
     
     protected $casts = [

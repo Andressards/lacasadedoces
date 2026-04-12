@@ -16,6 +16,5 @@ class Categoria extends Model
     public function produtos()
     {
         return $this->hasMany(Produtos::class, 'categoria_id'); 
-        // Substitua 'categoria_id' pelo nome correto da chave estrangeira na tabela 'produtos'
     }
 }

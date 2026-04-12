@@ -31,4 +31,9 @@ class Pedido extends Model
     {
         return $this->belongsTo(User::class);
     }
+
+    public function itens()
+    {
+        return $this->hasMany(PedidoItem::class);
+    }
 }

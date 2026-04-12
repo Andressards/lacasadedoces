@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Pedido;
 use App\Models\PedidoItem;
 use App\Models\ItemCarrinho;
+use App\Models\Produtos;
 use Illuminate\Http\Request;
 
 
@@ -154,11 +155,14 @@ class PedidoController extends Controller
 
     public function editar($id)
     {
-        // Busca o pedido pelo ID
-        $pedido = Pedido::findOrFail($id);
+        // Busca o pedido pelo ID com seus itens e produtos relacionados
+        $pedido = Pedido::with('itens.produto')->findOrFail($id);
+        
+        // Busca todos os produtos disponíveis para o dropdown de edição
+        $produtos = Produtos::where('ativo', true)->get();
 
         // Retorna a view de edição com os dados do pedido
-        return view('pedidos.edit', compact('pedido'));
+        return view('pedidos.edit', compact('pedido', 'produtos'));
     }
 
     // Método para visualizar histórico de pedidos
@@ -200,6 +204,75 @@ class PedidoController extends Controller
     public function formularioCriar()
     {
         return view('pedidos.create');
+    }
+
+    public function atualizar(Request $request, $id)
+    {
+        $pedido = Pedido::findOrFail($id);
+
+        // Validar dados do pedido
+        $request->validate([
+            'nome_cliente' => 'required|string|max:255',
+            'tipo_entrega' => 'required|in:entrega,retirada',
+            'data_entrega' => 'required|date',
+            'numero_contato' => 'nullable|string|max:20',
+            'observacao' => 'nullable|string',
+            'rua' => 'nullable|string|max:255',
+            'numero' => 'nullable|string|max:10',
+            'bairro' => 'nullable|string|max:255',
+            'quadra' => 'nullable|numeric',
+            'lote' => 'nullable|numeric',
+            'cep' => 'nullable|numeric',
+            'itens' => 'required|array|min:1',
+            'itens.*.produto_id' => 'required|exists:produtos,id',
+            'itens.*.quantidade' => 'required|numeric|min:1',
+        ]);
+
+        // Atualizar dados do pedido
+        $pedido->update([
+            'nome_cliente' => $request->nome_cliente,
+            'tipo_entrega' => $request->tipo_entrega,
+            'data_entrega' => $request->data_entrega,
+            'numero_contato' => $request->numero_contato,
+            'observacao' => $request->observacao,
+            'rua' => $request->rua,
+            'numero' => $request->numero,
+            'bairro' => $request->bairro,
+            'quadra' => $request->quadra,
+            'lote' => $request->lote,
+            'cep' => $request->cep,
+        ]);
+
+        // Rastrear IDs de itens enviados
+        $idsEnviados = [];
+        
+        // Atualizar ou criar itens do pedido
+        foreach ($request->itens as $item) {
+            if (!empty($item['id'])) {
+                // Atualizar item existente
+                $pedidoItem = PedidoItem::findOrFail($item['id']);
+                $pedidoItem->update([
+                    'produto_id' => $item['produto_id'],
+                    'quantidade' => $item['quantidade'],
+                ]);
+                $idsEnviados[] = $item['id'];
+            } else {
+                // Criar novo item
+                $novoItem = PedidoItem::create([
+                    'pedido_id' => $pedido->id,
+                    'produto_id' => $item['produto_id'],
+                    'quantidade' => $item['quantidade'],
+                ]);
+                $idsEnviados[] = $novoItem->id;
+            }
+        }
+
+        // Deletar itens que foram removidos (não estão no array de enviados)
+        PedidoItem::where('pedido_id', $pedido->id)
+            ->whereNotIn('id', $idsEnviados)
+            ->delete();
+
+        return redirect()->route('pedidos.gerenciar')->with('success', 'Pedido atualizado com sucesso!');
     }
 
 }

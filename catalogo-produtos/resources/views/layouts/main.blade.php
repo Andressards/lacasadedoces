@@ -57,10 +57,6 @@
 <main class="d-flex flex-column">
     <div class="container-fluid flex-grow-1">
         <div class="row">
-            @if(session('msg'))
-                <p class="msg">{{ session('msg') }}</p>
-            @endif
-
             @yield('content') <!-- Onde a tela de login será exibida -->
         </div>
     </div>

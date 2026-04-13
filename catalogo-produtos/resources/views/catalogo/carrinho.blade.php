@@ -57,6 +57,7 @@
 
         @php
             $itensCarrinho = session('carrinho', []);
+            $totalCarrinho = 0;
         @endphp
 
         @if(empty($itensCarrinho))
@@ -66,16 +67,45 @@
                 <thead>
                     <tr>
                         <th>Produto</th>
+                        <th>Configurações</th>
                         <th>Quantidade</th>
-                        <th>Preço</th>
+                        <th>Preço Unitário</th>
                         <th>Total</th>
                         <th>Ações</th>
                     </tr>
                 </thead>
                 <tbody>
                     @foreach($itensCarrinho as $id => $item)
+                        @php
+                            $precoUnitario = $item['preco'] + ($item['preco_adicional'] ?? 0);
+                            $totalItem = $precoUnitario * $item['quantidade'];
+                            $totalCarrinho += $totalItem;
+                        @endphp
                         <tr>
                             <td>{{ $item['nome'] }}</td>
+                            <td>
+                                @if(isset($item['opcoes']) && !empty($item['opcoes']))
+                                    @foreach($item['opcoes'] as $opcaoId => $configIds)
+                                        @php
+                                            $opcao = \App\Models\ProdutoOpcao::find($opcaoId);
+                                            $configIds = is_array($configIds) ? $configIds : [$configIds];
+                                        @endphp
+                                        @if($opcao)
+                                            <strong>{{ $opcao->nome }}:</strong><br>
+                                            @foreach($configIds as $configId)
+                                                @php
+                                                    $configuracao = \App\Models\ProdutoConfiguracao::find($configId);
+                                                @endphp
+                                                @if($configuracao)
+                                                    - {{ $configuracao->nome }} (+R$ {{ number_format($configuracao->preco_adicional, 2, ',', '.') }})<br>
+                                                @endif
+                                            @endforeach
+                                        @endif
+                                    @endforeach
+                                @else
+                                    <em>Nenhuma configuração</em>
+                                @endif
+                            </td>
                             <td>
                                 <form action="{{ route('carrinho.atualizar', $id) }}" method="POST">
                                     @csrf
@@ -83,8 +113,8 @@
                                     <button type="submit" class="btn btn-primary btn-sm">Atualizar</button>
                                 </form>
                             </td>
-                            <td>R$ {{ number_format($item['preco'], 2, ',', '.') }}</td>
-                            <td>R$ {{ number_format($item['preco'] * $item['quantidade'], 2, ',', '.') }}</td>
+                            <td>R$ {{ number_format($precoUnitario, 2, ',', '.') }}</td>
+                            <td>R$ {{ number_format($totalItem, 2, ',', '.') }}</td>
                             <td>
                                 <form action="{{ route('carrinho.remover', $id) }}" method="POST">
                                     @csrf
@@ -95,6 +125,13 @@
                         </tr>
                     @endforeach
                 </tbody>
+                <tfoot>
+                    <tr>
+                        <th colspan="4">Total do Carrinho:</th>
+                        <th>R$ {{ number_format($totalCarrinho, 2, ',', '.') }}</th>
+                        <th></th>
+                    </tr>
+                </tfoot>
             </table>
             <a href="{{ route('pedido.formulario') }}" class="btn btn-success mt-3">Finalizar Pedido</a>
         @endif

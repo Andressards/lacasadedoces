@@ -12,13 +12,13 @@ class ProdutoConfiguracaoController extends Controller
     public function index()
     {
         $produtos = Produtos::with('opcoes.configuracoes')->get();
-        return view('produtos.configuracoes.index', compact('produtos'));
+        return view('configuracoes.index', compact('produtos'));
     }
 
     public function create($produtoId)
     {
         $produto = Produtos::findOrFail($produtoId);
-        return view('produtos.configuracoes.create', compact('produto'));
+        return view('configuracoes.create', compact('produto'));
     }
 
     public function store(Request $request, $produtoId)
@@ -27,6 +27,9 @@ class ProdutoConfiguracaoController extends Controller
             'categoria' => 'required|string',
             'nome' => 'required|string',
             'tipo' => 'required|in:selecao_unica,selecao_multipla,quantidade_fixa',
+            'quantidade_fixa' => 'required_if:tipo,quantidade_fixa|integer|min:1',
+            'quantidade_minima' => 'required_if:tipo,selecao_multipla|integer|min:1',
+            'quantidade_maxima' => 'required_if:tipo,selecao_multipla|integer|min:1',
             'obrigatorio' => 'boolean',
             'configuracoes' => 'required|array|min:1',
             'configuracoes.*.valor' => 'required|string',
@@ -34,19 +37,28 @@ class ProdutoConfiguracaoController extends Controller
 
         $produto = Produtos::findOrFail($produtoId);
 
-        // Criar a opção
+        $quantidadeMinima = null;
+        $quantidadeMaxima = null;
+
+        if ($request->tipo === 'selecao_multipla') {
+            $quantidadeMinima = $request->quantidade_minima;
+            $quantidadeMaxima = $request->quantidade_maxima;
+        } elseif ($request->tipo === 'quantidade_fixa') {
+            $quantidadeMinima = $request->quantidade_fixa;
+            $quantidadeMaxima = $request->quantidade_fixa;
+        }
+
         $opcao = ProdutoOpcao::create([
             'produto_id' => $produto->id,
             'categoria' => $request->categoria,
             'nome' => $request->nome,
             'tipo' => $request->tipo,
-            'quantidade_minima' => $request->quantidade_minima,
-            'quantidade_maxima' => $request->quantidade_maxima,
+            'quantidade_minima' => $quantidadeMinima,
+            'quantidade_maxima' => $quantidadeMaxima,
             'obrigatorio' => $request->obrigatorio ?? true,
             'ordem' => ProdutoOpcao::where('produto_id', $produto->id)->max('ordem') + 1,
         ]);
 
-        // Criar as configurações
         foreach ($request->configuracoes as $config) {
             ProdutoConfiguracao::create([
                 'produto_opcao_id' => $opcao->id,
@@ -57,14 +69,14 @@ class ProdutoConfiguracaoController extends Controller
             ]);
         }
 
-        return redirect()->route('produtos.configuracoes.index')->with('success', 'Configuração criada com sucesso!');
+        return redirect()->route('produtos.configuracoes.index')->with('success', 'Configuracao criada com sucesso!');
     }
 
     public function edit($produtoId, $opcaoId)
     {
         $produto = Produtos::findOrFail($produtoId);
         $opcao = ProdutoOpcao::with('configuracoes')->findOrFail($opcaoId);
-        return view('produtos.configuracoes.edit', compact('produto', 'opcao'));
+        return view('configuracoes.edit', compact('produto', 'opcao'));
     }
 
     public function update(Request $request, $produtoId, $opcaoId)
@@ -73,6 +85,9 @@ class ProdutoConfiguracaoController extends Controller
             'categoria' => 'required|string',
             'nome' => 'required|string',
             'tipo' => 'required|in:selecao_unica,selecao_multipla,quantidade_fixa',
+            'quantidade_fixa' => 'required_if:tipo,quantidade_fixa|integer|min:1',
+            'quantidade_minima' => 'required_if:tipo,selecao_multipla|integer|min:1',
+            'quantidade_maxima' => 'required_if:tipo,selecao_multipla|integer|min:1',
             'obrigatorio' => 'boolean',
             'configuracoes' => 'required|array|min:1',
             'configuracoes.*.valor' => 'required|string',
@@ -80,20 +95,28 @@ class ProdutoConfiguracaoController extends Controller
 
         $opcao = ProdutoOpcao::findOrFail($opcaoId);
 
-        // Atualizar a opção
+        $quantidadeMinima = null;
+        $quantidadeMaxima = null;
+
+        if ($request->tipo === 'selecao_multipla') {
+            $quantidadeMinima = $request->quantidade_minima;
+            $quantidadeMaxima = $request->quantidade_maxima;
+        } elseif ($request->tipo === 'quantidade_fixa') {
+            $quantidadeMinima = $request->quantidade_fixa;
+            $quantidadeMaxima = $request->quantidade_fixa;
+        }
+
         $opcao->update([
             'categoria' => $request->categoria,
             'nome' => $request->nome,
             'tipo' => $request->tipo,
-            'quantidade_minima' => $request->quantidade_minima,
-            'quantidade_maxima' => $request->quantidade_maxima,
+            'quantidade_minima' => $quantidadeMinima,
+            'quantidade_maxima' => $quantidadeMaxima,
             'obrigatorio' => $request->obrigatorio ?? true,
         ]);
 
-        // Deletar configurações existentes
         $opcao->configuracoes()->delete();
 
-        // Criar novas configurações
         foreach ($request->configuracoes as $config) {
             ProdutoConfiguracao::create([
                 'produto_opcao_id' => $opcao->id,
@@ -104,7 +127,7 @@ class ProdutoConfiguracaoController extends Controller
             ]);
         }
 
-        return redirect()->route('produtos.configuracoes.index')->with('success', 'Configuração atualizada com sucesso!');
+        return redirect()->route('produtos.configuracoes.index')->with('success', 'Configuracao atualizada com sucesso!');
     }
 
     public function destroy($produtoId, $opcaoId)
@@ -112,6 +135,6 @@ class ProdutoConfiguracaoController extends Controller
         $opcao = ProdutoOpcao::findOrFail($opcaoId);
         $opcao->delete();
 
-        return redirect()->route('produtos.configuracoes.index')->with('success', 'Configuração removida com sucesso!');
+        return redirect()->route('produtos.configuracoes.index')->with('success', 'Configuracao removida com sucesso!');
     }
 }

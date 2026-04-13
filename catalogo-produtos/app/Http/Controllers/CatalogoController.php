@@ -13,28 +13,45 @@ class CatalogoController extends Controller
         $request->validate([
             'produto_id' => 'required|exists:produtos,id',
             'quantidade' => 'required|integer|min:1',
+            'opcoes' => 'nullable|array',
         ]);
 
         $produtoId = $request->produto_id;
         $quantidade = $request->quantidade;
+        $opcoes = $request->opcoes ?? [];
         $produto = Produtos::findOrFail($produtoId);
 
         // Obtém o carrinho atual da sessão
         $carrinho = session()->get('carrinho', []);
 
-        // Verifica se o produto já está no carrinho
-        if (isset($carrinho[$produtoId])) {
-            $carrinho[$produtoId]['quantidade'] += $quantidade;
-        } else {
-            // Adiciona um novo produto ao carrinho
-            $carrinho[$produtoId] = [
-                'id' => $produto->id,
-                'nome' => $produto->nome,
-                'preco' => $produto->preco,
-                'imagem' => $produto->imagem,
-                'quantidade' => $quantidade
-            ];
+        // Calcular preço adicional das opções
+        $precoAdicional = 0;
+        if (!empty($opcoes)) {
+            foreach ($opcoes as $opcaoId => $configIds) {
+                $configIds = is_array($configIds) ? $configIds : [$configIds];
+                foreach ($configIds as $configId) {
+                    $configuracao = \App\Models\ProdutoConfiguracao::find($configId);
+                    if ($configuracao) {
+                        $precoAdicional += $configuracao->preco_adicional;
+                    }
+                }
+            }
         }
+
+        // Criar identificador único para item com configurações
+        $itemKey = $produtoId . '_' . md5(serialize($opcoes));
+
+        // Adiciona o produto ao carrinho (sempre como novo item para configurações diferentes)
+        $carrinho[$itemKey] = [
+            'id' => $produto->id,
+            'nome' => $produto->nome,
+            'preco' => $produto->preco,
+            'preco_adicional' => $precoAdicional,
+            'imagem' => $produto->imagem,
+            'quantidade' => $quantidade,
+            'opcoes' => $opcoes,
+            'preco_total' => ($produto->preco + $precoAdicional) * $quantidade
+        ];
 
         // Atualiza o carrinho na sessão
         session()->put('carrinho', $carrinho);
@@ -54,8 +71,8 @@ class CatalogoController extends Controller
 
     public function show($id)
     {
-        // Buscar o produto pelo ID
-        $produto = Produtos::with('categoria')->findOrFail($id);
+        // Buscar o produto pelo ID com suas opções e configurações
+        $produto = Produtos::with(['categoria', 'opcoes.configuracoes'])->findOrFail($id);
 
         return view('catalogo.show', compact('produto'));
     }
@@ -84,6 +101,8 @@ class CatalogoController extends Controller
 
         if (isset($carrinho[$id])) {
             $carrinho[$id]['quantidade'] = $request->quantidade;
+            $precoUnitario = $carrinho[$id]['preco'] + ($carrinho[$id]['preco_adicional'] ?? 0);
+            $carrinho[$id]['preco_total'] = $precoUnitario * $request->quantidade;
             session()->put('carrinho', $carrinho);
         }
 

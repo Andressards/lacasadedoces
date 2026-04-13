@@ -17,6 +17,7 @@ Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 use App\Http\Controllers\ProdutosController;
 use App\Http\Controllers\CategoriasController;
 use App\Http\Controllers\PedidoController;
+use App\Http\Controllers\ProdutoConfiguracaoController;
 
 Route::middleware(['auth'])->group(function () {
     

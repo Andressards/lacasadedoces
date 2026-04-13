@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Pedido;
 use App\Models\PedidoItem;
+use App\Models\PedidoItemConfiguracao;
 use App\Models\ItemCarrinho;
 use App\Models\Produtos;
 use Illuminate\Http\Request;
@@ -58,14 +59,36 @@ class PedidoController extends Controller
 
         // Calcular o total do pedido
         $totalPedido = collect($itensCarrinho)->sum(function ($item) {
-            return $item['quantidade'] * $item['preco']; // Multiplica preço pela quantidade
+            $precoUnitario = $item['preco'] + ($item['preco_adicional'] ?? 0);
+            return $item['quantidade'] * $precoUnitario;
         });
 
         // Mapeia os itens para formato correto
         $itensPedido = collect($itensCarrinho)->map(function ($item) {
+            $precoUnitario = $item['preco'] + ($item['preco_adicional'] ?? 0);
+            $configuracoes = [];
+            
+            if (isset($item['opcoes']) && !empty($item['opcoes'])) {
+                foreach ($item['opcoes'] as $opcaoId => $configIds) {
+                    $configIds = is_array($configIds) ? $configIds : [$configIds];
+                    foreach ($configIds as $configId) {
+                        $configuracao = \App\Models\ProdutoConfiguracao::find($configId);
+                        if ($configuracao) {
+                            $configuracoes[] = [
+                                'opcao' => $configuracao->produtoOpcao->nome,
+                                'configuracao' => $configuracao->nome,
+                                'preco_adicional' => $configuracao->preco_adicional
+                            ];
+                        }
+                    }
+                }
+            }
+            
             return [
                 'produto' => $item['nome'],
                 'quantidade' => $item['quantidade'],
+                'preco_unitario' => $precoUnitario,
+                'configuracoes' => $configuracoes
             ];
         })->toArray();
 
@@ -87,12 +110,27 @@ class PedidoController extends Controller
 
         // Criar os itens do pedido na tabela pedido_itens
         foreach ($itensCarrinho as $item) {
-            PedidoItem::create([
+            $precoUnitario = $item['preco'] + ($item['preco_adicional'] ?? 0);
+            
+            $pedidoItem = PedidoItem::create([
                 'pedido_id' => $pedido->id,
                 'produto_id' => $item['id'],
                 'quantidade' => $item['quantidade'],
-                'preco_unitario' => $item['preco'], 
+                'preco_unitario' => $precoUnitario,
             ]);
+            
+            // Criar configurações do item se existirem
+            if (isset($item['opcoes']) && !empty($item['opcoes'])) {
+                foreach ($item['opcoes'] as $opcaoId => $configIds) {
+                    $configIds = is_array($configIds) ? $configIds : [$configIds];
+                    foreach ($configIds as $configId) {
+                        PedidoItemConfiguracao::create([
+                            'pedido_item_id' => $pedidoItem->id,
+                            'produto_configuracao_id' => $configId,
+                        ]);
+                    }
+                }
+            }
         }
 
         // Limpar o carrinho da sessão após finalizar pedido
@@ -110,7 +148,17 @@ class PedidoController extends Controller
             . "Itens do Pedido:\n";
 
         foreach ($itensPedido as $item) {
-            $mensagem .= "- {$item['produto']} (x{$item['quantidade']})\n";
+            $mensagem .= "- {$item['produto']} (x{$item['quantidade']}) - R$ " . number_format($item['preco_unitario'], 2, ',', '.') . "\n";
+            
+            if (!empty($item['configuracoes'])) {
+                foreach ($item['configuracoes'] as $config) {
+                    $mensagem .= "  └ {$config['opcao']}: {$config['configuracao']}";
+                    if ($config['preco_adicional'] > 0) {
+                        $mensagem .= " (+R$ " . number_format($config['preco_adicional'], 2, ',', '.') . ")";
+                    }
+                    $mensagem .= "\n";
+                }
+            }
         }
 
         if (!empty($pedido->observacao)) {

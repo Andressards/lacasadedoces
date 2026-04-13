@@ -27,4 +27,9 @@ class PedidoItem extends Model
     {
         return $this->belongsTo(Produtos::class);
     }
+
+    public function configuracoes()
+    {
+        return $this->hasMany(PedidoItemConfiguracao::class, 'pedido_item_id');
+    }
 }

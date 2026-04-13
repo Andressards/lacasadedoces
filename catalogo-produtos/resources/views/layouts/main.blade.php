@@ -41,6 +41,9 @@
                     <a href="/produtos" class="nav-link">Cadastrar Produtos</a>
                 </li>
                 <li class="nav-item">
+                    <a href="/produtos/configuracoes" class="nav-link">Configurações</a>
+                </li>
+                <li class="nav-item">
                     <form action="/logout" method="POST">
                         @csrf
                         <a href="/logout" class="nav-link"

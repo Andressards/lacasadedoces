@@ -35,6 +35,14 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/categorias', [CategoriasController::class, 'index'])->name('categorias.index');
     Route::get('/categorias/{id}/toggleStatus', [CategoriasController::class, 'toggleStatus'])->name('categorias.toggleStatus');
 
+    // Rotas para configurações de produtos
+    Route::get('/produtos/configuracoes', [ProdutoConfiguracaoController::class, 'index'])->name('produtos.configuracoes.index');
+    Route::get('/produtos/{produtoId}/configuracoes/create', [ProdutoConfiguracaoController::class, 'create'])->name('produtos.configuracoes.create');
+    Route::post('/produtos/{produtoId}/configuracoes', [ProdutoConfiguracaoController::class, 'store'])->name('produtos.configuracoes.store');
+    Route::get('/produtos/{produtoId}/configuracoes/{opcaoId}/edit', [ProdutoConfiguracaoController::class, 'edit'])->name('produtos.configuracoes.edit');
+    Route::put('/produtos/{produtoId}/configuracoes/{opcaoId}', [ProdutoConfiguracaoController::class, 'update'])->name('produtos.configuracoes.update');
+    Route::delete('/produtos/{produtoId}/configuracoes/{opcaoId}', [ProdutoConfiguracaoController::class, 'destroy'])->name('produtos.configuracoes.destroy');
+
     Route::get('/pedidos/{id}/cancelar', [PedidoController::class, 'cancelar'])->name('pedidos.cancelar');
     Route::get('/pedidos/{id}/finalizar', [PedidoController::class, 'finalizar'])->name('pedidos.finalizar');
     Route::get('/pedidos/{id}/ativar', [PedidoController::class, 'ativar'])->name('pedidos.ativar');

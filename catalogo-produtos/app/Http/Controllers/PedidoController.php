@@ -76,7 +76,7 @@ class PedidoController extends Controller
                         if ($configuracao) {
                             $configuracoes[] = [
                                 'opcao' => $configuracao->produtoOpcao->nome,
-                                'configuracao' => $configuracao->nome,
+                                'configuracao' => $configuracao->valor,
                                 'preco_adicional' => $configuracao->preco_adicional
                             ];
                         }
@@ -124,10 +124,14 @@ class PedidoController extends Controller
                 foreach ($item['opcoes'] as $opcaoId => $configIds) {
                     $configIds = is_array($configIds) ? $configIds : [$configIds];
                     foreach ($configIds as $configId) {
-                        PedidoItemConfiguracao::create([
-                            'pedido_item_id' => $pedidoItem->id,
-                            'produto_configuracao_id' => $configId,
-                        ]);
+                        $configuracao = \App\Models\ProdutoConfiguracao::find($configId);
+                        if ($configuracao) {
+                            PedidoItemConfiguracao::create([
+                                'pedido_item_id' => $pedidoItem->id,
+                                'produto_opcao_id' => $configuracao->produto_opcao_id,
+                                'produto_configuracao_id' => $configId,
+                            ]);
+                        }
                     }
                 }
             }
@@ -139,8 +143,7 @@ class PedidoController extends Controller
         // Montar mensagem para WhatsApp
         $numeroWhatsApp = '5562993847722';
 
-        $mensagem = "Pedido Realizado!\n"
-            . "Olá, gostaria de fazer um pedido!\n"
+        $mensagem = "Olá, gostaria de fazer um pedido!\n"
             . "\nCliente: {$pedido->nome_cliente}\n"
             . "Data de Entrega: {$pedido->data_entrega}\n"
             . "Tipo de Entrega: " . ucfirst($pedido->tipo_entrega) . "\n"
@@ -151,12 +154,27 @@ class PedidoController extends Controller
             $mensagem .= "- {$item['produto']} (x{$item['quantidade']}) - R$ " . number_format($item['preco_unitario'], 2, ',', '.') . "\n";
             
             if (!empty($item['configuracoes'])) {
+                // Group configurations by option
+                $configuracoesPorOpcao = [];
                 foreach ($item['configuracoes'] as $config) {
-                    $mensagem .= "  └ {$config['opcao']}: {$config['configuracao']}";
-                    if ($config['preco_adicional'] > 0) {
-                        $mensagem .= " (+R$ " . number_format($config['preco_adicional'], 2, ',', '.') . ")";
+                    $opcaoNome = $config['opcao'];
+                    if (!isset($configuracoesPorOpcao[$opcaoNome])) {
+                        $configuracoesPorOpcao[$opcaoNome] = [];
                     }
-                    $mensagem .= "\n";
+                    $configuracoesPorOpcao[$opcaoNome][] = $config;
+                }
+                
+                foreach ($configuracoesPorOpcao as $opcaoNome => $configs) {
+                    $mensagem .= "  └ {$opcaoNome}: ";
+                    $configuracaoTexts = [];
+                    foreach ($configs as $config) {
+                        $text = $config['configuracao'];
+                        if ($config['preco_adicional'] > 0) {
+                            $text .= " (+R$ " . number_format($config['preco_adicional'], 2, ',', '.') . ")";
+                        }
+                        $configuracaoTexts[] = $text;
+                    }
+                    $mensagem .= implode(', ', $configuracaoTexts) . "\n";
                 }
             }
         }

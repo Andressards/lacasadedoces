@@ -4,33 +4,69 @@ namespace App\Http\Controllers;
 
 use App\Models\Produtos;
 use App\Models\Categoria;
+use App\Models\ProdutoOpcao;
+use App\Models\ProdutoConfiguracao;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 
 class CatalogoController extends Controller
 {
     public function adicionarCarrinho(Request $request)
     {
-        $request->validate([
+        $validator = Validator::make($request->all(), [
             'produto_id' => 'required|exists:produtos,id',
             'quantidade' => 'required|integer|min:1',
             'opcoes' => 'nullable|array',
         ]);
 
+        if ($validator->fails()) {
+            return back()->withErrors($validator)->withInput();
+        }
+
         $produtoId = $request->produto_id;
         $quantidade = $request->quantidade;
-        $opcoes = $request->opcoes ?? [];
-        $produto = Produtos::findOrFail($produtoId);
+        $opcoesRecebidas = $request->opcoes ?? [];
+        $produto = Produtos::with('opcoes')->findOrFail($produtoId);
 
-        // Obtém o carrinho atual da sessão
-        $carrinho = session()->get('carrinho', []);
+        $errors = [];
+
+        // Validação de Opções Obrigatórias e Limites
+        foreach ($produto->opcoes as $opcao) {
+            $selecionados = isset($opcoesRecebidas[$opcao->id]) ? $opcoesRecebidas[$opcao->id] : [];
+            
+            // Converter para array se for seleção única (string/int)
+            if (!is_array($selecionados)) {
+                $selecionados = $selecionados ? [$selecionados] : [];
+            }
+
+            $totalSelecionados = count($selecionados);
+
+            // Validar obrigatoriedade
+            if ($opcao->obrigatorio && $totalSelecionados === 0) {
+                $errors["opcoes.{$opcao->id}"] = "A opção '{$opcao->nome}' é obrigatória.";
+            }
+
+            // Validar limites para seleção múltipla
+            if ($opcao->tipo === 'selecao_multipla') {
+                if ($totalSelecionados < $opcao->quantidade_minima) {
+                    $errors["opcoes.{$opcao->id}"] = "A opção '{$opcao->nome}' requer no mínimo {$opcao->quantidade_minima} seleções.";
+                } elseif ($totalSelecionados > $opcao->quantidade_maxima) {
+                    $errors["opcoes.{$opcao->id}"] = "A opção '{$opcao->nome}' permite no máximo {$opcao->quantidade_maxima} seleções.";
+                }
+            }
+        }
+
+        if (!empty($errors)) {
+            return back()->withErrors($errors)->withInput();
+        }
 
         // Calcular preço adicional das opções
         $precoAdicional = 0;
-        if (!empty($opcoes)) {
-            foreach ($opcoes as $opcaoId => $configIds) {
+        if (!empty($opcoesRecebidas)) {
+            foreach ($opcoesRecebidas as $opcaoId => $configIds) {
                 $configIds = is_array($configIds) ? $configIds : [$configIds];
                 foreach ($configIds as $configId) {
-                    $configuracao = \App\Models\ProdutoConfiguracao::find($configId);
+                    $configuracao = ProdutoConfiguracao::find($configId);
                     if ($configuracao) {
                         $precoAdicional += $configuracao->preco_adicional;
                     }
@@ -38,10 +74,16 @@ class CatalogoController extends Controller
             }
         }
 
-        // Criar identificador único para item com configurações
-        $itemKey = $produtoId . '_' . md5(serialize($opcoes));
+        // Obtém o carrinho atual da sessão
+        $carrinho = session()->get('carrinho', []);
 
-        // Adiciona o produto ao carrinho (sempre como novo item para configurações diferentes)
+        // Criar identificador único para item com configurações
+        // Usamos ksort para garantir que a ordem das opções não mude o hash
+        $opcoesParaHash = $opcoesRecebidas;
+        ksort($opcoesParaHash);
+        $itemKey = $produtoId . '_' . md5(serialize($opcoesParaHash));
+
+        // Adiciona ou atualiza o produto no carrinho
         $carrinho[$itemKey] = [
             'id' => $produto->id,
             'nome' => $produto->nome,
@@ -49,39 +91,31 @@ class CatalogoController extends Controller
             'preco_adicional' => $precoAdicional,
             'imagem' => $produto->imagem,
             'quantidade' => $quantidade,
-            'opcoes' => $opcoes,
+            'opcoes' => $opcoesRecebidas,
             'preco_total' => ($produto->preco + $precoAdicional) * $quantidade
         ];
 
         // Atualiza o carrinho na sessão
         session()->put('carrinho', $carrinho);
 
-        return redirect()->route('catalogo.show', $produtoId)->with('success', 'Produto adicionado ao carrinho!');
+        return redirect()->route('catalogo.carrinho')->with('success', 'Produto adicionado ao carrinho!');
     }
-
 
     public function exibirCarrinho()
     {
-        // Obtém os itens do carrinho da sessão (se existirem)
         $itensCarrinho = session()->get('carrinho', []);
-
         return view('catalogo.carrinho', compact('itensCarrinho'));
     }
 
-
     public function show($id)
     {
-        // Buscar o produto pelo ID com suas opções e configurações
         $produto = Produtos::with(['categoria', 'opcoes.configuracoes'])->findOrFail($id);
-
         return view('catalogo.show', compact('produto'));
     }
 
     public function index(Request $request)
     {
         $search = $request->input('search');
-
-        // Obtendo todas as categorias com seus produtos
         $categorias = Categoria::with(['produtos' => function ($query) use ($search) {
             if ($search) {
                 $query->where('nome', 'like', "%{$search}%");
@@ -120,5 +154,4 @@ class CatalogoController extends Controller
     
         return back()->with('success', 'Item removido do carrinho!');
     }
-    
 }

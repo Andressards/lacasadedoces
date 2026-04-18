@@ -97,7 +97,7 @@
                                                     $configuracao = \App\Models\ProdutoConfiguracao::find($configId);
                                                 @endphp
                                                 @if($configuracao)
-                                                    - {{ $configuracao->nome }} (+R$ {{ number_format($configuracao->preco_adicional, 2, ',', '.') }})<br>
+                                                    - {{ $configuracao->valor }} (+R$ {{ number_format($configuracao->preco_adicional, 2, ',', '.') }})<br>
                                                 @endif
                                             @endforeach
                                         @endif

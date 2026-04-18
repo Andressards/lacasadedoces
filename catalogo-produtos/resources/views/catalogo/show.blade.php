@@ -69,123 +69,132 @@
                     <h1 class="produto-nome">{{ $produto->nome }}</h1>
                     <p class="produto-descricao"><strong>Descrição:</strong> {{ $produto->descricao }}</p>
 
-                    <!-- Opções Configuráveis -->
-                    @if($produto->opcoes->count() > 0)
-                        <div class="produto-opcoes mb-4">
-                            <h4 class="mb-3">Personalize seu pedido:</h4>
-
-                            @foreach($produto->opcoes->sortBy('ordem') as $opcao)
-                                <div class="opcao-group mb-3 p-3 border rounded">
-                                    <h5 class="opcao-nome">
-                                        {{ $opcao->nome }}
-                                        @if($opcao->obrigatorio)
-                                            <span class="text-danger">*</span>
-                                        @endif
-                                    </h5>
-
-                                    @if($opcao->tipo == 'selecao_unica')
-                                        <!-- Seleção Única -->
-                                        <div class="opcao-selecao-unica">
-                                            @foreach($opcao->configuracoes->sortBy('ordem') as $config)
-                                                <div class="form-check">
-                                                    <input class="form-check-input opcao-radio" type="radio"
-                                                           name="opcoes[{{ $opcao->id }}]"
-                                                           value="{{ $config->id }}"
-                                                           data-preco-adicional="{{ $config->preco_adicional }}"
-                                                           {{ $opcao->obrigatorio ? 'required' : '' }}>
-                                                    <label class="form-check-label">
-                                                        {{ $config->valor }}
-                                                        @if($config->preco_adicional > 0)
-                                                            <small class="text-success">(+R$ {{ number_format($config->preco_adicional, 2, ',', '.') }})</small>
-                                                        @endif
-                                                        @if($config->descricao)
-                                                            <br><small class="text-muted">{{ $config->descricao }}</small>
-                                                        @endif
-                                                    </label>
-                                                </div>
-                                            @endforeach
-                                        </div>
-
-                                    @elseif($opcao->tipo == 'selecao_multipla')
-                                        <!-- Seleção Múltipla -->
-                                        <div class="opcao-selecao-multipla">
-                                            <small class="text-muted mb-2 d-block">
-                                                Selecione entre {{ $opcao->quantidade_minima }} e {{ $opcao->quantidade_maxima }} opções
-                                            </small>
-                                            @foreach($opcao->configuracoes->sortBy('ordem') as $config)
-                                                <div class="form-check">
-                                                    <input class="form-check-input opcao-checkbox"
-                                                           type="checkbox"
-                                                           name="opcoes[{{ $opcao->id }}][]"
-                                                           value="{{ $config->id }}"
-                                                           data-preco-adicional="{{ $config->preco_adicional }}"
-                                                           data-opcao-id="{{ $opcao->id }}">
-                                                    <label class="form-check-label">
-                                                        {{ $config->valor }}
-                                                        @if($config->preco_adicional > 0)
-                                                            <small class="text-success">(+R$ {{ number_format($config->preco_adicional, 2, ',', '.') }})</small>
-                                                        @endif
-                                                        @if($config->descricao)
-                                                            <br><small class="text-muted">{{ $config->descricao }}</small>
-                                                        @endif
-                                                    </label>
-                                                </div>
-                                            @endforeach
-                                        </div>
-
-                                    @else
-                                        <!-- Quantidade Fixa - mostra apenas informativo -->
-                                        <div class="opcao-quantidade-fixa">
-                                            <p class="mb-1">Inclui:</p>
-                                            <ul class="list-unstyled">
-                                                @foreach($opcao->configuracoes->sortBy('ordem') as $config)
-                                                    <li>
-                                                        {{ $config->valor }}
-                                                        @if($config->descricao)
-                                                            <small class="text-muted"> - {{ $config->descricao }}</small>
-                                                        @endif
-                                                    </li>
-                                                @endforeach
-                                            </ul>
-                                        </div>
-                                    @endif
-                                </div>
-                            @endforeach
-                        </div>
-                    @endif
-
-                    <h2 class="produto-preco" id="preco-total">R$ {{ number_format($produto->preco, 2, ',', '.') }}</h2>
-
                     <!-- Formulário de Adicionar ao Carrinho -->
-                    <form action="{{ route('catalogo.adicionarCarrinho') }}" method="POST">
+                    <form id="form-adicionar-carrinho" action="{{ route('catalogo.adicionarCarrinho') }}" method="POST">
                         @csrf
                         <input type="hidden" name="produto_id" value="{{ $produto->id }}">
+
+                        <!-- Opções Configuráveis -->
+                        @if($produto->opcoes->count() > 0)
+                            <div class="produto-opcoes mb-4">
+                                <h4 class="mb-3">Personalize seu pedido:</h4>
+
+                                @foreach($produto->opcoes->sortBy('ordem') as $opcao)
+                                    <div class="opcao-group mb-3 p-3 border rounded {{ $errors->has('opcoes.' . $opcao->id) ? 'border-danger' : '' }}" id="opcao-group-{{ $opcao->id }}">
+                                        <h5 class="opcao-nome">
+                                            {{ $opcao->nome }}
+                                            @if($opcao->obrigatorio)
+                                                <span class="text-danger">*</span>
+                                            @endif
+                                        </h5>
+
+                                        <!-- Container para mensagens de erro (Backend e Frontend) -->
+                                        <div class="error-message text-danger small mb-2" id="error-{{ $opcao->id }}">
+                                            @if($errors->has('opcoes.' . $opcao->id))
+                                                {{ $errors->first('opcoes.' . $opcao->id) }}
+                                            @endif
+                                        </div>
+
+                                        @if($opcao->tipo == 'selecao_unica')
+                                            <!-- Seleção Única -->
+                                            <div class="opcao-selecao-unica">
+                                                @foreach($opcao->configuracoes->sortBy('ordem') as $config)
+                                                    <div class="form-check">
+                                                        <input class="form-check-input opcao-radio" type="radio"
+                                                               name="opcoes[{{ $opcao->id }}]"
+                                                               value="{{ $config->id }}"
+                                                               data-preco-adicional="{{ $config->preco_adicional }}"
+                                                               data-opcao-id="{{ $opcao->id }}"
+                                                               {{ (old("opcoes.{$opcao->id}") == $config->id) ? 'checked' : '' }}
+                                                               {{ $opcao->obrigatorio ? 'required' : '' }}>
+                                                        <label class="form-check-label">
+                                                            {{ $config->valor }}
+                                                            @if($config->preco_adicional > 0)
+                                                                <small class="text-success">(+R$ {{ number_format($config->preco_adicional, 2, ',', '.') }})</small>
+                                                            @endif
+                                                            @if($config->descricao)
+                                                                <br><small class="text-muted">{{ $config->descricao }}</small>
+                                                            @endif
+                                                        </label>
+                                                    </div>
+                                                @endforeach
+                                            </div>
+
+                                        @elseif($opcao->tipo == 'selecao_multipla')
+                                            <!-- Seleção Múltipla -->
+                                            <div class="opcao-selecao-multipla" 
+                                                 data-min="{{ $opcao->quantidade_minima }}" 
+                                                 data-max="{{ $opcao->quantidade_maxima }}"
+                                                 data-nome="{{ $opcao->nome }}"
+                                                 data-opcao-id="{{ $opcao->id }}">
+                                                <small class="text-muted mb-2 d-block">
+                                                    Selecione entre {{ $opcao->quantidade_minima }} e {{ $opcao->quantidade_maxima }} opções
+                                                </small>
+                                                @foreach($opcao->configuracoes->sortBy('ordem') as $config)
+                                                    <div class="form-check">
+                                                        <input class="form-check-input opcao-checkbox"
+                                                               type="checkbox"
+                                                               name="opcoes[{{ $opcao->id }}][]"
+                                                               value="{{ $config->id }}"
+                                                               data-preco-adicional="{{ $config->preco_adicional }}"
+                                                               data-opcao-id="{{ $opcao->id }}"
+                                                               {{ (is_array(old("opcoes.{$opcao->id}")) && in_array($config->id, old("opcoes.{$opcao->id}"))) ? 'checked' : '' }}>
+                                                        <label class="form-check-label">
+                                                            {{ $config->valor }}
+                                                            @if($config->preco_adicional > 0)
+                                                                <small class="text-success">(+R$ {{ number_format($config->preco_adicional, 2, ',', '.') }})</small>
+                                                            @endif
+                                                            @if($config->descricao)
+                                                                <br><small class="text-muted">{{ $config->descricao }}</small>
+                                                            @endif
+                                                        </label>
+                                                    </div>
+                                                @endforeach
+                                            </div>
+
+                                        @else
+                                            <!-- Quantidade Fixa - mostra apenas informativo -->
+                                            <div class="opcao-quantidade-fixa">
+                                                <p class="mb-1">Inclui:</p>
+                                                <ul class="list-unstyled">
+                                                    @foreach($opcao->configuracoes->sortBy('ordem') as $config)
+                                                        <li>
+                                                            {{ $config->valor }}
+                                                            @if($config->descricao)
+                                                                <small class="text-muted"> - {{ $config->descricao }}</small>
+                                                            @endif
+                                                        </li>
+                                                    @endforeach
+                                                </ul>
+                                            </div>
+                                        @endif
+                                    </div>
+                                @endforeach
+                            </div>
+                        @endif
+
+                        <h2 class="produto-preco" id="preco-total">R$ {{ number_format($produto->preco, 2, ',', '.') }}</h2>
+
                         <div class="form-group">
                             <label for="quantidade">Quantidade:</label>
-                            <input type="number" name="quantidade" id="quantidade" min="1" value="1" required>
+                            <input type="number" name="quantidade" id="quantidade" min="1" value="{{ old('quantidade', 1) }}" required class="form-control w-25">
                         </div>
+
                         <div class="d-flex gap-3 mt-4">
-                            @if($produto->opcoes->count() > 0)
-                                <!-- Produto com configurações - usar JavaScript -->
-                                <button class="btn btn-primary add-to-cart" data-id="{{ $produto->id }}" data-nome="{{ $produto->nome }}" data-preco="{{ $produto->preco }}">
-                                    Adicionar ao Carrinho
-                                </button>
-                            @else
-                                <!-- Produto sem configurações - usar formulário normal -->
-                                <button type="submit" class="btn btn-primary">
-                                    Adicionar ao Carrinho
-                                </button>
-                            @endif
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                Adicionar ao Carrinho
+                            </button>
                             <a href="/catalogo" class="btn btn-outline-secondary btn-lg">Voltar ao Catálogo</a>
                         </div>
+
                         @if(session('success'))
-                            <div class="alert alert-success">
+                            <div class="alert alert-success mt-3">
                                 {{ session('success') }}
                             </div>
                         @endif
 
                         @if(session('error'))
-                            <div class="alert alert-danger">
+                            <div class="alert alert-danger mt-3">
                                 {{ session('error') }}
                             </div>
                         @endif
@@ -197,129 +206,93 @@
 </section>
 
 <script>
-    // Preço base do produto
     const precoBase = {{ $produto->preco }};
     const precoTotalElement = document.getElementById('preco-total');
+    const form = document.getElementById('form-adicionar-carrinho');
 
-    // Função para calcular o preço total
     function calcularPrecoTotal() {
         let precoTotal = precoBase;
+        const quantidade = parseInt(document.getElementById('quantidade').value) || 1;
 
-        // Somar preços adicionais das opções selecionadas
         document.querySelectorAll('.opcao-radio:checked, .opcao-checkbox:checked').forEach(input => {
             const precoAdicional = parseFloat(input.getAttribute('data-preco-adicional')) || 0;
             precoTotal += precoAdicional;
         });
 
-        // Multiplicar pela quantidade
-        const quantidade = parseInt(document.getElementById('quantidade').value) || 1;
         precoTotal *= quantidade;
-
         precoTotalElement.textContent = 'R$ ' + precoTotal.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
     }
 
-    // Validar seleções múltiplas
-    function validarSelecaoMultipla() {
-        @foreach($produto->opcoes->where('tipo', 'selecao_multipla') as $opcao)
-            const checkboxes = document.querySelectorAll(`input[name="opcoes[{{ $opcao->id }}][]"]:checked`);
-            const min = {{ $opcao->quantidade_minima }};
-            const max = {{ $opcao->quantidade_maxima }};
-
-            if (checkboxes.length < min || checkboxes.length > max) {
-                return false;
-            }
-        @endforeach
-        return true;
-    }
-
-    // Event listeners para atualizar preço
+    // Event listeners para atualizar preço e limpar erros ao interagir
     document.addEventListener('change', function(e) {
         if (e.target.classList.contains('opcao-radio') || e.target.classList.contains('opcao-checkbox')) {
             calcularPrecoTotal();
+            
+            // Limpar erro visual ao selecionar
+            const opcaoId = e.target.getAttribute('data-opcao-id');
+            const group = document.getElementById(`opcao-group-${opcaoId}`);
+            const errorDiv = document.getElementById(`error-${opcaoId}`);
+            if (group) group.classList.remove('border-danger');
+            if (errorDiv) errorDiv.textContent = '';
         }
     });
 
     document.getElementById('quantidade').addEventListener('input', calcularPrecoTotal);
 
-    // Modificar o botão de adicionar ao carrinho
-    document.querySelector('.add-to-cart').addEventListener('click', function(e) {
-        e.preventDefault();
+    // Validação antes de enviar (Frontend sem alert)
+    form.addEventListener('submit', function(e) {
+        let valido = true;
 
-        // Validar opções obrigatórias
-        const opcoesObrigatorias = document.querySelectorAll('.opcao-radio[required]');
-        let opcoesValidas = true;
-
-        opcoesObrigatorias.forEach(radio => {
-            const groupName = radio.name;
-            const checked = document.querySelector(`input[name="${groupName}"]:checked`);
-            if (!checked) {
-                opcoesValidas = false;
-            }
-        });
+        // Limpar erros anteriores
+        document.querySelectorAll('.opcao-group').forEach(g => g.classList.remove('border-danger'));
+        document.querySelectorAll('.error-message').forEach(m => m.textContent = '');
 
         // Validar seleções múltiplas
-        if (!validarSelecaoMultipla()) {
-            opcoesValidas = false;
-        }
+        document.querySelectorAll('.opcao-selecao-multipla').forEach(container => {
+            const min = parseInt(container.getAttribute('data-min'));
+            const max = parseInt(container.getAttribute('data-max'));
+            const nome = container.getAttribute('data-nome');
+            const opcaoId = container.getAttribute('data-opcao-id');
+            const selecionados = container.querySelectorAll('input[type="checkbox"]:checked').length;
 
-        if (!opcoesValidas) {
-            alert('Por favor, selecione todas as opções obrigatórias e respeite os limites de seleção.');
-            return;
-        }
-
-        // Coletar configurações selecionadas
-        const configuracoesSelecionadas = {};
-
-        // Coletar seleções únicas
-        document.querySelectorAll('.opcao-radio:checked').forEach(radio => {
-            const opcaoId = radio.name.match(/opcoes\[(\d+)\]/)[1];
-            configuracoesSelecionadas[opcaoId] = [radio.value];
-        });
-
-        // Coletar seleções múltiplas
-        document.querySelectorAll('.opcao-checkbox:checked').forEach(checkbox => {
-            const opcaoId = checkbox.getAttribute('data-opcao-id');
-            if (!configuracoesSelecionadas[opcaoId]) {
-                configuracoesSelecionadas[opcaoId] = [];
-            }
-            configuracoesSelecionadas[opcaoId].push(checkbox.value);
-        });
-
-        // Preparar dados do produto
-        const produtoId = this.getAttribute('data-id');
-        const nome = this.getAttribute('data-nome');
-        const preco = precoBase;
-        const quantidade = parseInt(document.getElementById('quantidade').value) || 1;
-
-        // Calcular preço total das opções
-        let precoOpcoes = 0;
-        Object.values(configuracoesSelecionadas).flat().forEach(configId => {
-            const input = document.querySelector(`input[value="${configId}"]`);
-            if (input) {
-                precoOpcoes += parseFloat(input.getAttribute('data-preco-adicional')) || 0;
+            if (selecionados < min) {
+                valido = false;
+                document.getElementById(`opcao-group-${opcaoId}`).classList.add('border-danger');
+                document.getElementById(`error-${opcaoId}`).textContent = `A opção "${nome}" requer no mínimo ${min} seleções.`;
+            } else if (selecionados > max) {
+                valido = false;
+                document.getElementById(`opcao-group-${opcaoId}`).classList.add('border-danger');
+                document.getElementById(`error-${opcaoId}`).textContent = `A opção "${nome}" permite no máximo ${max} seleções.`;
             }
         });
 
-        const precoTotal = (preco + precoOpcoes) * quantidade;
+        // Validar seleções únicas obrigatórias (caso o required do HTML falhe ou seja removido)
+        document.querySelectorAll('.opcao-selecao-unica').forEach(container => {
+            const radio = container.querySelector('input[type="radio"]');
+            if (radio && radio.hasAttribute('required')) {
+                const opcaoId = radio.getAttribute('data-opcao-id');
+                const selecionado = container.querySelector('input[type="radio"]:checked');
+                if (!selecionado) {
+                    valido = false;
+                    document.getElementById(`opcao-group-${opcaoId}`).classList.add('border-danger');
+                    document.getElementById(`error-${opcaoId}`).textContent = `Esta opção é obrigatória.`;
+                }
+            }
+        });
 
-        // Adicionar ao carrinho (localStorage)
-        let carrinho = JSON.parse(localStorage.getItem('carrinho')) || [];
-        const itemCarrinho = {
-            id: produtoId,
-            nome: nome,
-            preco: preco,
-            preco_opcoes: precoOpcoes,
-            quantidade: quantidade,
-            configuracoes: configuracoesSelecionadas,
-            preco_total: precoTotal
-        };
-
-        carrinho.push(itemCarrinho);
-        localStorage.setItem('carrinho', JSON.stringify(carrinho));
-
-        alert('Produto personalizado adicionado ao carrinho!');
+        if (!valido) {
+            e.preventDefault();
+            // Scroll suave até o primeiro erro
+            const primeiroErro = document.querySelector('.border-danger');
+            if (primeiroErro) {
+                primeiroErro.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+        }
     });
 
     // Calcular preço inicial
     document.addEventListener('DOMContentLoaded', calcularPrecoTotal);
 </script>
+
+</body>
+</html>

@@ -84,7 +84,13 @@
                 </thead>
                 <tbody id="itens-container">
                     @forelse($pedido->itens as $index => $item)
-                        <tr class="item-row">
+                        @php
+                            $selectedConfigs = $item->configuracoes->groupBy('produto_opcao_id')
+                                ->map(function($group) {
+                                    return $group->pluck('produto_configuracao_id')->toArray();
+                                })->toArray();
+                        @endphp
+                        <tr class="item-row" data-selected-configs='@json($selectedConfigs)'>
                             <td>
                                 <input type="hidden" name="itens[{{ $index }}][id]" value="{{ $item->id }}">
                                 <select name="itens[{{ $index }}][produto_id]" class="form-select produto-select" data-index="{{ $index }}">
@@ -94,6 +100,7 @@
                                         </option>
                                     @endforeach
                                 </select>
+                                <div class="configuracoes-container mt-2"></div>
                             </td>
                             <td>
                                 <input type="number" name="itens[{{ $index }}][preco]" class="form-control preco-input" value="{{ $item->produto->preco ?? 0 }}" step="0.01" readonly>
@@ -140,8 +147,125 @@
 </div>
 
 <script>
-    // Dados dos produtos para preço
+    @php
+        $produtosOpcoes = $produtos->mapWithKeys(function($produto) {
+            return [$produto->id => [
+                'opcoes' => $produto->opcoes->map(function($opcao) {
+                    return [
+                        'id' => $opcao->id,
+                        'nome' => $opcao->nome,
+                        'tipo' => $opcao->tipo,
+                        'obrigatorio' => $opcao->obrigatorio,
+                        'quantidade_minima' => $opcao->quantidade_minima,
+                        'quantidade_maxima' => $opcao->quantidade_maxima,
+                        'configuracoes' => $opcao->configuracoes->map(function($config) {
+                            return [
+                                'id' => $config->id,
+                                'valor' => $config->valor,
+                                'preco_adicional' => $config->preco_adicional,
+                                'descricao' => $config->descricao,
+                            ];
+                        })->toArray(),
+                    ];
+                })->toArray(),
+            ]];
+        })->toArray();
+    @endphp
+
+    // Dados dos produtos para preço e opções
     const produtosData = @json($produtos->pluck('preco', 'id'));
+    const produtosOpcoes = @json($produtosOpcoes);
+
+    function renderConfiguracoesRow(row, produtoId, selectedConfigs = {}) {
+        const container = row.querySelector('.configuracoes-container');
+        container.innerHTML = '';
+
+        if (!produtoId || !produtosOpcoes[produtoId] || produtosOpcoes[produtoId].opcoes.length === 0) {
+            container.innerHTML = '<em>Nenhuma configuração</em>';
+            return;
+        }
+
+        let html = '';
+        const index = row.querySelector('.produto-select').dataset.index;
+        produtosOpcoes[produtoId].opcoes.forEach(opcao => {
+            const configs = opcao.configuracoes || [];
+            if (configs.length === 0) {
+                return;
+            }
+
+            const selected = selectedConfigs[opcao.id] || [];
+            const selectedArray = Array.isArray(selected) ? selected.map(String) : [String(selected)];
+
+            html += '<div class="opcao-group mb-2 p-2 border rounded">';
+            html += '<div class="fw-bold mb-1">' + opcao.nome + (opcao.obrigatorio ? ' <span class="text-danger">*</span>' : '') + '</div>';
+
+            if (opcao.tipo === 'selecao_unica') {
+                configs.forEach(config => {
+                    const checked = selectedArray.includes(String(config.id)) ? 'checked' : '';
+                    html += '<div class="form-check">';
+                    html += '<input class="form-check-input configuracao-input" type="radio" name="itens[' + index + '][configuracoes][' + opcao.id + '][]" value="' + config.id + '" data-preco-adicional="' + config.preco_adicional + '" ' + checked + ' ' + (opcao.obrigatorio ? 'required' : '') + '>';
+                    html += '<label class="form-check-label">' + config.valor;
+                    if (config.preco_adicional > 0) {
+                        html += ' <small class="text-success">(+R$ ' + Number(config.preco_adicional).toFixed(2).replace('.', ',') + ')</small>';
+                    }
+                    if (config.descricao) {
+                        html += '<br><small class="text-muted">' + config.descricao + '</small>';
+                    }
+                    html += '</label></div>';
+                });
+            } else if (opcao.tipo === 'selecao_multipla') {
+                configs.forEach(config => {
+                    const checked = selectedArray.includes(String(config.id)) ? 'checked' : '';
+                    html += '<div class="form-check">';
+                    html += '<input class="form-check-input configuracao-input" type="checkbox" name="itens[' + index + '][configuracoes][' + opcao.id + '][]" value="' + config.id + '" data-preco-adicional="' + config.preco_adicional + '" ' + checked + '>';
+                    html += '<label class="form-check-label">' + config.valor;
+                    if (config.preco_adicional > 0) {
+                        html += ' <small class="text-success">(+R$ ' + Number(config.preco_adicional).toFixed(2).replace('.', ',') + ')</small>';
+                    }
+                    if (config.descricao) {
+                        html += '<br><small class="text-muted">' + config.descricao + '</small>';
+                    }
+                    html += '</label></div>';
+                });
+            } else {
+                html += '<div class="small text-muted">Configuração fixa: ' + configs.map(config => config.valor).join(', ') + '</div>';
+                configs.forEach(config => {
+                    html += '<input type="hidden" name="itens[' + index + '][configuracoes][' + opcao.id + '][]" value="' + config.id + '">';
+                });
+            }
+
+            html += '</div>';
+        });
+
+        container.innerHTML = html;
+    }
+
+    function atualizarPrecoDoItem(row) {
+        const produtoId = row.querySelector('.produto-select').value;
+        const precoInput = row.querySelector('.preco-input');
+        let precoBase = parseFloat(produtosData[produtoId] || 0);
+        let adicional = 0;
+        row.querySelectorAll('.configuracao-input:checked').forEach(input => {
+            adicional += parseFloat(input.dataset.precoAdicional || 0);
+        });
+        precoInput.value = (precoBase + adicional).toFixed(2);
+    }
+
+    function atualizarSubtotalDoItem(row) {
+        const preco = parseFloat(row.querySelector('.preco-input').value) || 0;
+        const quantidade = parseFloat(row.querySelector('.quantidade-input').value) || 0;
+        const subtotal = preco * quantidade;
+        row.querySelector('.subtotal').textContent = 'R$ ' + subtotal.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        return subtotal;
+    }
+
+    function calcularTotais() {
+        let total = 0;
+        document.querySelectorAll('.item-row').forEach(row => {
+            total += atualizarSubtotalDoItem(row);
+        });
+        document.getElementById('total-pedido').textContent = 'R$ ' + total.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    }
 
     // Toggle endereço container
     document.getElementById('tipo_entrega').addEventListener('change', function() {
@@ -159,33 +283,21 @@
         }
     });
 
-    // Função para calcular subtotal e total
-    function calcularTotais() {
-        let total = 0;
-        document.querySelectorAll('.item-row').forEach(row => {
-            const preco = parseFloat(row.querySelector('.preco-input').value) || 0;
-            const quantidade = parseFloat(row.querySelector('.quantidade-input').value) || 0;
-            const subtotal = preco * quantidade;
-            row.querySelector('.subtotal').textContent = 'R$ ' + subtotal.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-            total += subtotal;
-        });
-        document.getElementById('total-pedido').textContent = 'R$ ' + total.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-    }
-
-    // Atualizar preço quando produto é selecionado
+    // Atualizar preço quando produto ou configuração é modificada
     document.addEventListener('change', (e) => {
         if (e.target.classList.contains('produto-select')) {
             const produtoId = e.target.value;
             const row = e.target.closest('.item-row');
             const precoInput = row.querySelector('.preco-input');
             precoInput.value = produtosData[produtoId] || 0;
+            renderConfiguracoesRow(row, produtoId);
+            atualizarPrecoDoItem(row);
             calcularTotais();
         }
-    });
 
-    // Atualizar total quando quantidade muda
-    document.addEventListener('change', (e) => {
-        if (e.target.classList.contains('quantidade-input')) {
+        if (e.target.classList.contains('configuracao-input') || e.target.classList.contains('quantidade-input')) {
+            const row = e.target.closest('.item-row');
+            atualizarPrecoDoItem(row);
             calcularTotais();
         }
     });
@@ -212,6 +324,7 @@
 
         const newRow = document.createElement('tr');
         newRow.classList.add('item-row');
+        newRow.dataset.selectedConfigs = JSON.stringify({});
         newRow.innerHTML = `
             <td>
                 <input type="hidden" name="itens[${index}][id]" value="">
@@ -219,6 +332,7 @@
                     <option value="">Selecione um produto</option>
                     ${produtosOptions}
                 </select>
+                <div class="configuracoes-container mt-2"><em>Nenhuma configuração</em></div>
             </td>
             <td>
                 <input type="number" name="itens[${index}][preco]" class="form-control preco-input" value="0" step="0.01" readonly>
@@ -241,6 +355,12 @@
 
     // Calcular totais ao carregar a página
     document.addEventListener('DOMContentLoaded', function() {
+        document.querySelectorAll('.item-row').forEach(row => {
+            const produtoId = row.querySelector('.produto-select').value;
+            const selectedConfigs = row.dataset.selectedConfigs ? JSON.parse(row.dataset.selectedConfigs) : {};
+            renderConfiguracoesRow(row, produtoId, selectedConfigs);
+            atualizarPrecoDoItem(row);
+        });
         calcularTotais();
         // Disparar mudança de tipo_entrega para carregar estado correto
         document.getElementById('tipo_entrega').dispatchEvent(new Event('change'));

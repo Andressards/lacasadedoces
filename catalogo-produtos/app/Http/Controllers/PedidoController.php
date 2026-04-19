@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Pedido;
 use App\Models\PedidoItem;
 use App\Models\PedidoItemConfiguracao;
+use App\Models\ProdutoConfiguracao;
 use App\Models\ItemCarrinho;
 use App\Models\Produtos;
 use Illuminate\Http\Request;
@@ -241,11 +242,11 @@ class PedidoController extends Controller
 
     public function editar($id)
     {
-        // Busca o pedido pelo ID com seus itens e produtos relacionados
-        $pedido = Pedido::with('itens.produto')->findOrFail($id);
+        // Busca o pedido pelo ID com seus itens, configurações e produtos relacionados
+        $pedido = Pedido::with('itens.produto', 'itens.configuracoes.produtoConfiguracao')->findOrFail($id);
         
         // Busca todos os produtos disponíveis para o dropdown de edição
-        $produtos = Produtos::where('ativo', true)->get();
+        $produtos = Produtos::where('ativo', true)->with('opcoes.configuracoes')->get();
 
         // Retorna a view de edição com os dados do pedido
         return view('pedidos.edit', compact('pedido', 'produtos'));
@@ -334,27 +335,66 @@ class PedidoController extends Controller
 
         // Rastrear IDs de itens enviados
         $idsEnviados = [];
-        
+
         // Atualizar ou criar itens do pedido
         foreach ($request->itens as $item) {
+            $produto = Produtos::findOrFail($item['produto_id']);
+            $precoUnitario = $produto->preco;
+            $selectedConfigIds = [];
+
+            if (isset($item['configuracoes']) && is_array($item['configuracoes'])) {
+                foreach ($item['configuracoes'] as $opcaoId => $configIds) {
+                    $configIds = is_array($configIds) ? $configIds : [$configIds];
+                    foreach ($configIds as $configId) {
+                        $selectedConfigIds[] = $configId;
+                    }
+                }
+            }
+
+            $configuracoes = ProdutoConfiguracao::whereIn('id', $selectedConfigIds)->get();
+            foreach ($configuracoes as $configuracao) {
+                $precoUnitario += $configuracao->preco_adicional;
+            }
+
             if (!empty($item['id'])) {
                 // Atualizar item existente
                 $pedidoItem = PedidoItem::findOrFail($item['id']);
                 $pedidoItem->update([
                     'produto_id' => $item['produto_id'],
                     'quantidade' => $item['quantidade'],
+                    'preco_unitario' => $precoUnitario,
                 ]);
                 $idsEnviados[] = $item['id'];
             } else {
                 // Criar novo item
-                $produto = Produtos::find($item['produto_id']);
                 $novoItem = PedidoItem::create([
                     'pedido_id' => $pedido->id,
                     'produto_id' => $item['produto_id'],
                     'quantidade' => $item['quantidade'],
-                    'preco_unitario' => $produto->preco,
+                    'preco_unitario' => $precoUnitario,
                 ]);
                 $idsEnviados[] = $novoItem->id;
+                $pedidoItem = $novoItem;
+            }
+
+            // Atualizar configurações do item
+            PedidoItemConfiguracao::where('pedido_item_id', $pedidoItem->id)->delete();
+
+            if (isset($item['configuracoes']) && is_array($item['configuracoes'])) {
+                foreach ($item['configuracoes'] as $opcaoId => $configIds) {
+                    $configIds = is_array($configIds) ? $configIds : [$configIds];
+                    foreach ($configIds as $configId) {
+                        $configuracao = ProdutoConfiguracao::find($configId);
+                        if ($configuracao) {
+                            PedidoItemConfiguracao::create([
+                                'pedido_item_id' => $pedidoItem->id,
+                                'produto_opcao_id' => $configuracao->produto_opcao_id,
+                                'produto_configuracao_id' => $configId,
+                                'quantidade' => 1,
+                            ]);
+                        }
+                    }
+                }
             }
         }
 

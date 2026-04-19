@@ -252,6 +252,13 @@ class PedidoController extends Controller
         return view('pedidos.edit', compact('pedido', 'produtos'));
     }
 
+    public function imprimir($id)
+    {
+        $pedido = Pedido::with('itens.produto', 'itens.configuracoes.produtoConfiguracao')->findOrFail($id);
+
+        return view('pedidos.print', compact('pedido'));
+    }
+
     // Método para visualizar histórico de pedidos
     public function historico()
     {

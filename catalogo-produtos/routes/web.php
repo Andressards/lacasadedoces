@@ -49,6 +49,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/pedidos/{id}/ativar', [PedidoController::class, 'ativar'])->name('pedidos.ativar');
     Route::get('/pedidos/gerenciar', [PedidoController::class, 'gerenciar'])->name('pedidos.gerenciar');
     Route::get('/pedidos/{id}/editar', [PedidoController::class, 'editar'])->name('pedidos.edit');
+    Route::get('/pedidos/{id}/imprimir', [PedidoController::class, 'imprimir'])->name('pedidos.imprimir');
     Route::post('/pedidos/{id}/atualizar', [PedidoController::class, 'atualizar'])->name('pedidos.atualizar');
     Route::get('/pedidos/historico', [PedidoController::class, 'historico'])->name('pedidos.historico');
     Route::get('/pedidos/criar', [PedidoController::class, 'formularioCriar'])->name('pedido.criar'); // Para exibir o formulário

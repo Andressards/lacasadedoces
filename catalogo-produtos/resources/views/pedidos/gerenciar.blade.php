@@ -29,6 +29,7 @@
                     <th>Concluir</th>
                     <th>Cancelar</th>
                     <th>Editar</th>
+                    <th>Imprimir</th>
                 </tr>
             </thead>
             <tbody>
@@ -55,6 +56,9 @@
                         </td>
                         <td>
                             <a href="{{ route('pedidos.edit', $pedido->id) }}" class="btn btn-warning">Editar</a>
+                        </td>
+                        <td>
+                            <a href="{{ route('pedidos.imprimir', $pedido->id) }}" target="_blank" class="btn btn-info">Imprimir</a>
                         </td>
                     </tr>
                 @endforeach

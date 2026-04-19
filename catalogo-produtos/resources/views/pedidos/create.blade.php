@@ -6,7 +6,7 @@
         <h1 class="titulo-form" id="titulo-form-membro">Criar Pedido Manualmente</h1>
     </div>
 
-    <<form action="{{ route('pedido.criar') }}" method="POST">
+    <form action="{{ route('pedidos.salvar') }}" method="POST">
         @csrf
 
         <div class="mb-3">
@@ -49,6 +49,8 @@
 </div>
 
 <script>
+    const produtos = @json($produtos);
+
     document.getElementById('add-item').addEventListener('click', function() {
         let container = document.getElementById('itens-container');
         let index = container.getElementsByClassName('item-pedido').length;
@@ -56,13 +58,15 @@
         let div = document.createElement('div');
         div.classList.add('mb-3', 'item-pedido');
 
+        let selectOptions = '<option value="">Selecione um produto</option>';
+        produtos.forEach(produto => {
+            selectOptions += `<option value="${produto.id}">${produto.nome} (R$ ${parseFloat(produto.preco).toFixed(2).replace('.', ',')})</option>`;
+        });
+
         div.innerHTML = `
             <label class="form-label">Produto</label>
             <select name="itens[${index}][produto_id]" class="form-control select-produto" required>
-                <option value="">Selecione um produto</option>
-                @foreach($produtos as $produto)
-                    <option value="{{ $produto->id }}">{{ $produto->nome }} (R$ {{ number_format($produto->preco, 2, ',', '.') }})</option>
-                @endforeach
+                ${selectOptions}
             </select>
 
             <label class="form-label">Quantidade</label>

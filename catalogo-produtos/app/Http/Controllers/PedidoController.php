@@ -277,11 +277,33 @@ class PedidoController extends Controller
 
     public function criarPedidos(Request $request)
     {
+        $request->validate([
+            'nome_cliente' => 'required|string|max:255',
+            'data_entrega' => 'required|date|after:now',
+            'numero_contato' => 'nullable|string|max:20',
+            'itens' => 'required|array|min:1',
+            'itens.*.produto_id' => 'required|exists:produtos,id',
+            'itens.*.quantidade' => 'required|integer|min:1',
+        ]);
+
+        // Preparar os itens do pedido para o campo JSON
+        $itensPedido = collect($request->itens)->map(function ($item) {
+            $produto = Produtos::find($item['produto_id']);
+            return [
+                'produto_id' => $item['produto_id'],
+                'nome' => $produto->nome,
+                'quantidade' => $item['quantidade'],
+                'preco_unitario' => $produto->preco,
+                'preco_total' => $produto->preco * $item['quantidade'],
+            ];
+        })->toArray();
+
         $pedido = Pedido::create([
             'nome_cliente' => $request->nome_cliente,
             'data_entrega' => $request->data_entrega,
             'numero_contato' => $request->numero_contato,
             'observacao' => $request->observacao ?? null,
+            'itens_pedido' => $itensPedido,
             'status' => 'pendente',
         ]);
 
@@ -295,12 +317,13 @@ class PedidoController extends Controller
             ]);
         }
 
-        return redirect()->route('pedidos.index')->with('success', 'Pedido criado com sucesso!');
+        return redirect()->route('pedidos.gerenciar')->with('success', 'Pedido criado com sucesso!');
     }
 
     public function formularioCriar()
     {
-        return view('pedidos.create');
+        $produtos = Produtos::where('ativo', true)->get();
+        return view('pedidos.create', compact('produtos'));
     }
 
     public function atualizar(Request $request, $id)

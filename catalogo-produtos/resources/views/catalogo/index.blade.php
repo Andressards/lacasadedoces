@@ -94,9 +94,10 @@
         <h3 class="titulo"><strong>Catálogo de Produtos</strong></h3>
 
         <div class="filtro-container">
-            <form action="{{ route('catalogo.index') }}" method="GET" class="form-busca">
+            <form action="{{ route('catalogo.index') }}#catalogo-section" method="GET" class="form-busca">
                 <input type="text" name="search" placeholder="Buscar produto..." value="{{ request('search') }}">
                 <button type="submit" class="btn btn-secondary">Buscar</button>
+                <a href="{{ route('catalogo.index') }}#catalogo-section" class="btn btn-outline-secondary">Limpar</a>
             </form>
         </div>
     </div>

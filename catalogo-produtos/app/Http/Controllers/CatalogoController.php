@@ -116,7 +116,8 @@ class CatalogoController extends Controller
     public function index(Request $request)
     {
         $search = $request->input('search');
-        $categorias = Categoria::with(['produtos' => function ($query) use ($search) {
+        $categorias = Categoria::where('ativo', true)->with(['produtos' => function ($query) use ($search) {
+            $query->where('ativo', true);
             if ($search) {
                 $query->where('nome', 'like', "%{$search}%");
             }

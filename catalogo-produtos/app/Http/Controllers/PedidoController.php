@@ -34,9 +34,12 @@ class PedidoController extends Controller
                 'required',
                 'date',
                 function ($attribute, $value, $fail) {
+                    $timestamp = strtotime($value);
                     $minTime = strtotime('+3 hours'); // Hora atual + 3 horas
-                    if (strtotime($value) < $minTime) {
-                        $fail('A data de entrega deve ser pelo menos 3 horas após o horário atual.');
+                    $hora = date('H:i', $timestamp);
+
+                    if ($timestamp < $minTime || $hora > '20:00') {
+                        $fail('Pedidos com mínimo de 3 horas de antecedência, até às 20h.');
                     }
                 },
             ],

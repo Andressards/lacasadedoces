@@ -10,19 +10,38 @@
         @csrf
 
         <div class="mb-3">
-            <label for="nome_cliente" class="form-label">Nome do Cliente</label>
+            <label for="nome_cliente" class="form-label required-label">Nome do Cliente</label>
             <input type="text" name="nome_cliente" id="nome_cliente" class="form-control" required>
         </div>
 
         <div class="mb-3">
-            <label for="data_entrega" class="form-label">Data de Entrega</label>
-            <input type="datetime-local" name="data_entrega" id="data_entrega" class="form-control" required>
+            <label for="data_entrega" class="form-label required-label">Data de Entrega</label>
+            <input type="datetime-local" 
+                name="data_entrega" 
+                class="form-control @error('data_entrega') is-invalid @enderror" 
+                value="{{ old('data_entrega') }}" 
+                required 
+                min="{{ date('Y-m-d\TH:i', strtotime('+3 hours')) }}">
+
+            @error('data_entrega')
+                <div class="invalid-feedback">{{ $message }}</div>
+            @enderror
+
+            <small class="text-muted">Pedidos com mínimo de 3 horas de antecedência, até às 20h.</small>
+
         </div>  
 
         <div class="mb-3">
-            <label for="numero-contato" class="form-label">Número para contato</label>
-            <input type="text" name="numero_contato" id="numero_contato" class="form-control">
+            <label for="telefone" class="form-label required-label">Telefone de Contato</label>
+            <input type="text" 
+                name="telefone" 
+                id="telefone" 
+                class="form-control" 
+                placeholder="(00) 00000-0000"
+                oninput="mascaraTelefone(this)" 
+                maxlength="15">
         </div>
+
 
         <div class="mb-3">
             <label for="obs" class="form-label">Observação</label>
@@ -30,7 +49,7 @@
         </div>
 
         <div class="mb-3">
-            <label for="tipo_entrega" class="form-label">Tipo de Entrega</label>
+            <label for="tipo_entrega" class="form-label required-label">Tipo de Entrega</label>
             <select name="tipo_entrega" id="tipo_entrega" class="form-control" required>
                 <option value="retirada">Retirada</option>
                 <option value="entrega">Entrega</option>
@@ -45,27 +64,27 @@
             </div>
 
             <div class="mb-3">
-                <label for="numero" class="form-label">Nº</label>
+                <label for="numero" class="form-label required-label">Nº</label>
                 <input type="text" name="numero" id="numero" class="form-control">
             </div>
 
             <div class="mb-3">
-                <label for="quadra" class="form-label">Quadra</label>
+                <label for="quadra" class="form-label required-label">Quadra</label>
                 <input type="number" name="quadra" id="quadra" class="form-control">
             </div>
 
             <div class="mb-3">
-                <label for="lote" class="form-label">Lote</label>
+                <label for="lote" class="form-label required-label">Lote</label>
                 <input type="number" name="lote" id="lote" class="form-control">
             </div>
 
             <div class="mb-3">
-                <label for="bairro" class="form-label">Bairro</label>
+                <label for="bairro" class="form-label required-label">Bairro</label>
                 <input type="text" name="bairro" id="bairro" class="form-control">
             </div>
 
             <div class="mb-3">
-                <label for="cep" class="form-label">CEP</label>
+                <label for="cep" class="form-label required-label">CEP</label>
                 <input type="number" name="cep" id="cep" class="form-control">
             </div>
         </div> 

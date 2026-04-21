@@ -25,6 +25,13 @@
         padding: 10px;
     }
 
+    .required-label::after {
+        content: " *";
+        color: red;
+        font-weight: bold;
+    }
+
+
     .row {
         margin: 10px;
     }

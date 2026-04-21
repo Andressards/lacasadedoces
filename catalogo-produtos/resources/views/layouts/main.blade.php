@@ -28,6 +28,7 @@
                 <img src="/img/logo_lacasadedoces-removebg-preview.png" alt="lacasadedoces">
             </a>
             <ul class="navbar-nav ms-auto">
+                @auth
                 <li class="nav-item">
                     <a href="/pedidos/historico" class="nav-link">Histórico de Pedidos</a>
                 </li>
@@ -51,6 +52,18 @@
                            this.closest('form').submit();">Voltar ao Site</a>
                     </form>
                 </li>
+                @endauth
+                
+                @guest
+                <li class="nav-item">
+                    <form action="/logout" method="POST">
+                        @csrf
+                        <a href="/logout" class="nav-link"
+                           onclick="event.preventDefault();
+                           this.closest('form').submit();">Voltar ao Site</a>
+                    </form>
+                </li>
+                @endguest
             </ul>
             <navbar-brand></navbar-brand>
         </div>

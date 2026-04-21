@@ -49,9 +49,6 @@
                     <li class="nav-item">
                         <a href="/catalogo" class="nav-link">Catálogo</a>
                     </li>
-                    <li class="nav-item">
-                        <a href="/categorias" class="nav-link">Entrar</a>
-                    </li>
                 </ul>
             </div>
         </div>

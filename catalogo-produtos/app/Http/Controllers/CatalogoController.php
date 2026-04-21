@@ -155,4 +155,87 @@ class CatalogoController extends Controller
     
         return back()->with('success', 'Item removido do carrinho!');
     }
+
+    public function editarConfiguracao($id)
+    {
+        $carrinho = session()->get('carrinho', []);
+
+        if (!isset($carrinho[$id])) {
+            return redirect()->route('catalogo.carrinho')->with('error', 'Item não encontrado no carrinho.');
+        }
+
+        $item = $carrinho[$id];
+        $produto = Produtos::with(['opcoes.configuracoes'])->findOrFail($item['id']);
+
+        return view('catalogo.editar-configuracao', compact('produto', 'item', 'id'));
+    }
+
+    public function atualizarConfiguracao(Request $request, $id)
+    {
+        $carrinho = session()->get('carrinho', []);
+
+        if (!isset($carrinho[$id])) {
+            return redirect()->route('catalogo.carrinho')->with('error', 'Item não encontrado no carrinho.');
+        }
+
+        $item = $carrinho[$id];
+        $produto = Produtos::with('opcoes')->findOrFail($item['id']);
+
+        $validator = Validator::make($request->all(), [
+            'quantidade' => 'required|integer|min:1',
+            'opcoes' => 'nullable|array',
+        ]);
+
+        if ($validator->fails()) {
+            return back()->withErrors($validator)->withInput();
+        }
+
+        $quantidade = $request->quantidade;
+        $opcoesRecebidas = $request->opcoes ?? [];
+
+        // Recalcular preço adicional
+        $precoAdicional = 0;
+        $errors = [];
+
+        foreach ($produto->opcoes as $opcao) {
+            if ($opcao->tipo == 'selecao_unica') {
+                $configIds = isset($opcoesRecebidas[$opcao->id]) && !empty($opcoesRecebidas[$opcao->id]) ? [$opcoesRecebidas[$opcao->id]] : [];
+            } elseif ($opcao->tipo == 'selecao_multipla') {
+                $configIds = $opcoesRecebidas[$opcao->id] ?? [];
+            } else {
+                $configIds = []; // quantidade_fixa não tem input do usuário
+            }
+
+            if ($opcao->obrigatorio && empty($configIds)) {
+                $errors[] = "A opção '{$opcao->nome}' é obrigatória.";
+                continue;
+            }
+
+            if ($opcao->tipo == 'selecao_multipla' && $opcao->max_selecoes > 0 && count($configIds) > $opcao->max_selecoes) {
+                $errors[] = "A opção '{$opcao->nome}' permite no máximo {$opcao->max_selecoes} seleções.";
+                continue;
+            }
+
+            foreach ($configIds as $configId) {
+                $configuracao = $opcao->configuracoes->find($configId);
+                if ($configuracao) {
+                    $precoAdicional += $configuracao->preco_adicional;
+                }
+            }
+        }
+
+        if (!empty($errors)) {
+            return back()->withErrors($errors)->withInput();
+        }
+
+        // Atualizar o item no carrinho
+        $carrinho[$id]['quantidade'] = $quantidade;
+        $carrinho[$id]['opcoes'] = $opcoesRecebidas;
+        $carrinho[$id]['preco_adicional'] = $precoAdicional;
+        $carrinho[$id]['preco_total'] = ($produto->preco + $precoAdicional) * $quantidade;
+
+        session()->put('carrinho', $carrinho);
+
+        return redirect()->route('pedido.formulario')->with('success', 'Configuração do item atualizada!');
+    }
 }

@@ -90,13 +90,50 @@
         </div> 
 
         <h4>Itens do Pedido</h4>
-        <ul class="list-group mb-3">
-            @foreach($itensCarrinho as $item)
-                <li class="list-group-item">
-                    {{ $item['nome'] }} - Quantidade: {{ $item['quantidade'] }}
-                </li>
-            @endforeach
-        </ul>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Produto</th>
+                    <th>Configurações</th>
+                    <th>Quantidade</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach($itensCarrinho as $id => $item)
+                    <tr>
+                        <td>{{ $item['nome'] }}</td>
+                        <td>
+                            @if(isset($item['opcoes']) && !empty($item['opcoes']))
+                                @foreach($item['opcoes'] as $opcaoId => $configIds)
+                                    @php
+                                        $opcao = \App\Models\ProdutoOpcao::find($opcaoId);
+                                        $configIds = is_array($configIds) ? $configIds : [$configIds];
+                                    @endphp
+                                    @if($opcao)
+                                        <strong>{{ $opcao->nome }}:</strong><br>
+                                        @foreach($configIds as $configId)
+                                            @php
+                                                $configuracao = \App\Models\ProdutoConfiguracao::find($configId);
+                                            @endphp
+                                            @if($configuracao)
+                                                - {{ $configuracao->valor }} (+R$ {{ number_format($configuracao->preco_adicional, 2, ',', '.') }})<br>
+                                            @endif
+                                        @endforeach
+                                    @endif
+                                @endforeach
+                            @else
+                                Nenhuma configuração
+                            @endif
+                        </td>
+                        <td>{{ $item['quantidade'] }}</td>
+                        <td>
+                            <a href="{{ route('carrinho.editarConfiguracao', $id) }}" class="btn btn-warning btn-sm">Editar Configuração</a>
+                        </td>
+                    </tr>
+                @endforeach
+            </tbody>
+        </table>
 
         <button type="submit" class="btn btn-primary">Confirmar Pedido</button>
     </form>

@@ -69,3 +69,5 @@ Route::post('/catalogo/adicionar-carrinho', [CatalogoController::class, 'adicion
 Route::get('/carrinho', [CatalogoController::class, 'exibirCarrinho'])->name('catalogo.carrinho');
 Route::post('/carrinho/atualizar/{id}', [CatalogoController::class, 'atualizarCarrinho'])->name('carrinho.atualizar');  // Atualizar quantidade do item no carrinho
 Route::delete('/carrinho/remover/{id}', [CatalogoController::class, 'removerDoCarrinho'])->name('carrinho.remover');  // Remover item do carrinho
+Route::get('/carrinho/editar-configuracao/{id}', [CatalogoController::class, 'editarConfiguracao'])->name('carrinho.editarConfiguracao');  // Editar configuração do item
+Route::post('/carrinho/atualizar-configuracao/{id}', [CatalogoController::class, 'atualizarConfiguracao'])->name('carrinho.atualizarConfiguracao');  // Atualizar configuração do item

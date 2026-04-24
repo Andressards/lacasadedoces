@@ -1,0 +1,222 @@
+.checkout-main {
+    flex-grow: 1;
+    padding: 20px 0;
+    min-height: calc(100vh - 140px);
+    width: 100%;
+}
+
+.checkout-container {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 20px;
+    width: 100% !important;
+    box-sizing: border-box;
+}
+
+.checkout-header {
+    color: #9a4f2f;
+    padding: 20px;
+    border-radius: 10px;
+    margin-bottom: 30px;
+    text-align: center;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.checkout-header h1 {
+    margin: 0;
+    font-size: 28px;
+    font-family: 'Poppins', sans-serif;
+}
+
+/* Formulário e Campos */
+.checkout-form {
+    background: #fff;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    margin-bottom: 30px;
+    width: 100% !important;
+    box-sizing: border-box;
+}
+
+.form-section {
+    margin-bottom: 30px;
+    width: 100%;
+}
+
+.form-section h3 {
+    color: #9a4f2f;
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #9a4f2f;
+}
+
+.form-group {
+    margin-bottom: 20px;
+    width: 100% !important;
+    display: block;
+}
+
+.form-label {
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 8px;
+    display: block;
+}
+
+.required-label::after {
+    content: " *";
+    color: red;
+    font-weight: bold;
+}
+
+/* FORÇAR LARGURA TOTAL EM TODOS OS CAMPOS */
+.checkout-form .form-control,
+.checkout-form input[type="text"],
+.checkout-form input[type="number"],
+.checkout-form input[type="datetime-local"],
+.checkout-form select,
+.checkout-form textarea {
+    width: 100% !important;
+    max-width: 100% !important;
+    display: block !important;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 16px; /* Evita zoom no iOS */
+    box-sizing: border-box !important;
+}
+
+.form-control:focus {
+    border-color: #9a4f2f;
+    box-shadow: 0 0 0 0.2rem rgba(154, 79, 47, 0.25);
+}
+
+.form-text {
+    font-size: 12px;
+    color: #666;
+    margin-top: 5px;
+}
+
+/* Tabela de itens do pedido */
+.pedido-itens-section {
+    background: #fff;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    margin-bottom: 30px;
+    width: 100% !important;
+    box-sizing: border-box;
+}
+
+.pedido-itens-section h3 {
+    color: #9a4f2f;
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #9a4f2f;
+}
+
+.table-responsive {
+    width: 100% !important;
+    overflow-x: auto;
+}
+
+.table {
+    margin-bottom: 0;
+    width: 100% !important;
+}
+
+.table thead th {
+    background-color: #9a4f2f;
+    color: white;
+    font-weight: 600;
+    border: none;
+    padding: 12px;
+}
+
+/* Botões */
+.btn-checkout, .btn-checkout-secondary {
+    width: auto;
+    padding: 12px 24px;
+    border-radius: 5px;
+    font-weight: 600;
+    text-align: center;
+    display: inline-block;
+    cursor: pointer;
+    border: none;
+}
+
+.btn-checkout { background-color: #9a4f2f; color: white; }
+.btn-checkout-secondary { background-color: #6c757d; color: white; }
+
+.btn-actions {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    margin-top: 30px;
+    flex-wrap: wrap;
+    width: 100%;
+}
+
+/* RESPONSIVIDADE */
+
+@media (max-width: 768px) {
+    .checkout-container {
+        padding: 10px;
+    }
+
+    .checkout-form, .pedido-itens-section {
+        padding: 20px;
+    }
+
+    .btn-checkout, .btn-checkout-secondary {
+        width: 100% !important;
+        margin-bottom: 10px;
+    }
+
+    .btn-actions {
+        flex-direction: column;
+    }
+}
+
+@media (max-width: 576px) {
+    .checkout-header h1 {
+        font-size: 20px;
+    }
+
+    .checkout-form, .pedido-itens-section {
+        padding: 15px;
+    }
+
+    .form-section h3 {
+        font-size: 16px;
+    }
+
+    .table-hide-mobile {
+        display: none;
+    }
+}
+
+/* Ajuste para o container de endereço */
+#endereco-container {
+    width: 100% !important;
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 2px solid #eee;
+}
+
+/* Mensagens de erro */
+.invalid-feedback {
+    display: block;
+    color: #dc3545;
+    font-size: 12px;
+    margin-top: 5px;
+}
+
+.is-invalid {
+    border-color: #dc3545 !important;
+}

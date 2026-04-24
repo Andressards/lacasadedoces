@@ -1,142 +1,129 @@
-<!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+@extends('layouts.checkout')
 
-    <title>LaCasaDeDoces</title>
-
-    <!-- Fonte do Google -->
-    <link href="https://fonts.googleapis.com/css2?family=Roboto" rel="stylesheet">
-
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400..700&family=Poppins:wght@100;200;300;400;500;600;700;800;900&family=Roboto:wght@100;300;400;500;700;900&display=swap" rel="stylesheet">
-
-    <!-- CSS Bootstrap -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-
-    <!-- CSS da aplicação -->
-    <link rel="stylesheet" href="/css/style_site.css">
-
-    <!-- Script do Ionicons -->
-    <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
-    <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
-</head>
-<body>
-
-<header>
-<nav class="navbar navbar-expand-lg navbar-light">
-    <div class="container-fluid">
-        <a class="navbar-brand" href="/">
-            <img src="/img/logo_lacasadedoces-removebg-preview.png" alt="LaCasaDeDoces">
-        </a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav ms-auto">
-                <li class="nav-item">
-                    <a href="/catalogo" class="nav-link">Catálogo</a>
-                </li>
-            </ul>
-        </div>
+@section('content')
+<div class="checkout-container">
+    <div class="checkout-header">
+        <h1>Meu Carrinho</h1>
     </div>
-</nav>
 
-</header>
+    @if(session('success'))
+        <div class="alert alert-success">{{ session('success') }}</div>
+    @endif
 
-<section class="produtos-carrinho-container">
-    <div class="container mt-4">
-        <h2>Meu Carrinho</h2>
+    @php
+        $itensCarrinho = session('carrinho', []);
+        $totalCarrinho = 0;
+    @endphp
 
-        @if(session('success'))
-            <div class="alert alert-success">{{ session('success') }}</div>
-        @endif
-
-        @php
-            $itensCarrinho = session('carrinho', []);
-            $totalCarrinho = 0;
-        @endphp
-
-        @if(empty($itensCarrinho))
-            <p>Seu carrinho está vazio.</p>
-        @else
-            <table class="table">
-                <thead>
-                    <tr>
-                        <th>Produto</th>
-                        <th>Configurações</th>
-                        <th>Quantidade</th>
-                        <th>Preço Unitário</th>
-                        <th>Total</th>
-                        <th>Ações</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach($itensCarrinho as $id => $item)
-                        @php
-                            $precoUnitario = $item['preco'] + ($item['preco_adicional'] ?? 0);
-                            $totalItem = $precoUnitario * $item['quantidade'];
-                            $totalCarrinho += $totalItem;
-                        @endphp
+    @if(empty($itensCarrinho))
+        <div style="text-align: center; padding: 40px 20px;">
+            <p style="font-size: 18px; color: #666; margin-bottom: 20px;">Seu carrinho está vazio.</p>
+            <a href="/catalogo" class="btn btn-checkout">Continuar Comprando</a>
+        </div>
+    @else
+        <div class="pedido-itens-section">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
                         <tr>
-                            <td>{{ $item['nome'] }}</td>
-                            <td>
-                                @if(isset($item['opcoes']) && !empty($item['opcoes']))
-                                    @foreach($item['opcoes'] as $opcaoId => $configIds)
-                                        @php
-                                            $opcao = \App\Models\ProdutoOpcao::find($opcaoId);
-                                            $configIds = is_array($configIds) ? $configIds : [$configIds];
-                                        @endphp
-                                        @if($opcao)
-                                            <strong>{{ $opcao->nome }}:</strong><br>
-                                            @foreach($configIds as $configId)
+                            <th>Produto</th>
+                            <th class="table-hide-mobile">Configurações</th>
+                            <th>Qtd</th>
+                            <th class="table-hide-mobile">Preço Unit.</th>
+                            <th class="table-hide-mobile">Total</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach($itensCarrinho as $id => $item)
+                            @php
+                                $precoUnitario = $item['preco'] + ($item['preco_adicional'] ?? 0);
+                                $totalItem = $precoUnitario * $item['quantidade'];
+                                $totalCarrinho += $totalItem;
+                            @endphp
+                            <tr>
+                                <td>
+                                    <strong>{{ $item['nome'] }}</strong>
+                                    @if(isset($item['opcoes']) && !empty($item['opcoes']))
+                                        <div style="font-size: 11px; color: #666; margin-top: 5px;">
+                                            @foreach($item['opcoes'] as $opcaoId => $configIds)
                                                 @php
-                                                    $configuracao = \App\Models\ProdutoConfiguracao::find($configId);
+                                                    $opcao = \App\Models\ProdutoOpcao::find($opcaoId);
+                                                    $configIds = is_array($configIds) ? $configIds : [$configIds];
                                                 @endphp
-                                                @if($configuracao)
-                                                    - {{ $configuracao->valor }} (+R$ {{ number_format($configuracao->preco_adicional, 2, ',', '.') }})<br>
+                                                @if($opcao)
+                                                    <div><strong>{{ $opcao->nome }}:</strong></div>
+                                                    @foreach($configIds as $configId)
+                                                        @php
+                                                            $configuracao = \App\Models\ProdutoConfiguracao::find($configId);
+                                                        @endphp
+                                                        @if($configuracao)
+                                                            <div>- {{ $configuracao->valor }} (+R$ {{ number_format($configuracao->preco_adicional, 2, ',', '.') }})</div>
+                                                        @endif
+                                                    @endforeach
                                                 @endif
                                             @endforeach
-                                        @endif
-                                    @endforeach
-                                @else
-                                    <em>Nenhuma configuração</em>
-                                @endif
-                            </td>
-                            <td>
-                                <form action="{{ route('carrinho.atualizar', $id) }}" method="POST">
-                                    @csrf
-                                    <input type="number" name="quantidade" value="{{ $item['quantidade'] }}" min="1">
-                                    <button type="submit" class="btn btn-primary btn-sm">Atualizar</button>
-                                </form>
-                            </td>
-                            <td>R$ {{ number_format($precoUnitario, 2, ',', '.') }}</td>
-                            <td>R$ {{ number_format($totalItem, 2, ',', '.') }}</td>
-                            <td>
-                                <form action="{{ route('carrinho.remover', $id) }}" method="POST">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" class="btn btn-danger btn-sm">Remover</button>
-                                </form>
-                            </td>
+                                        </div>
+                                    @else
+                                        <div style="font-size: 11px; color: #999; margin-top: 5px;"><em>Sem configurações</em></div>
+                                    @endif
+                                </td>
+                                <td class="table-hide-mobile">
+                                    @if(isset($item['opcoes']) && !empty($item['opcoes']))
+                                        @foreach($item['opcoes'] as $opcaoId => $configIds)
+                                            @php
+                                                $opcao = \App\Models\ProdutoOpcao::find($opcaoId);
+                                                $configIds = is_array($configIds) ? $configIds : [$configIds];
+                                            @endphp
+                                            @if($opcao)
+                                                <strong>{{ $opcao->nome }}:</strong><br>
+                                                @foreach($configIds as $configId)
+                                                    @php
+                                                        $configuracao = \App\Models\ProdutoConfiguracao::find($configId);
+                                                    @endphp
+                                                    @if($configuracao)
+                                                        - {{ $configuracao->valor }} (+R$ {{ number_format($configuracao->preco_adicional, 2, ',', '.') }})<br>
+                                                    @endif
+                                                @endforeach
+                                            @endif
+                                        @endforeach
+                                    @else
+                                        <em>Nenhuma configuração</em>
+                                    @endif
+                                </td>
+                                <td>
+                                    <form action="{{ route('carrinho.atualizar', $id) }}" method="POST" style="display: flex; gap: 5px; flex-wrap: wrap;">
+                                        @csrf
+                                        <input type="number" name="quantidade" value="{{ $item['quantidade'] }}" min="1" style="width: 50px; padding: 5px; border: 1px solid #ddd; border-radius: 3px;">
+                                        <button type="submit" class="btn btn-sm btn-checkout" style="padding: 5px 10px; font-size: 12px;">Atualizar</button>
+                                    </form>
+                                </td>
+                                <td class="table-hide-mobile">R$ {{ number_format($precoUnitario, 2, ',', '.') }}</td>
+                                <td class="table-hide-mobile">R$ {{ number_format($totalItem, 2, ',', '.') }}</td>
+                                <td>
+                                    <form action="{{ route('carrinho.remover', $id) }}" method="POST" style="display: inline;">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="btn btn-sm btn-danger" style="padding: 5px 10px; font-size: 12px;">Remover</button>
+                                    </form>
+                                </td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                    <tfoot>
+                        <tr style="background-color: #f8f9fa; font-weight: bold;">
+                            <td colspan="4" style="text-align: right; padding: 15px;">Total do Carrinho:</td>
+                            <td colspan="2" style="padding: 15px; color: #9a4f2f; font-size: 18px;">R$ {{ number_format($totalCarrinho, 2, ',', '.') }}</td>
                         </tr>
-                    @endforeach
-                </tbody>
-                <tfoot>
-                    <tr>
-                        <th colspan="4">Total do Carrinho:</th>
-                        <th>R$ {{ number_format($totalCarrinho, 2, ',', '.') }}</th>
-                        <th></th>
-                    </tr>
-                </tfoot>
-            </table>
-            <a href="{{ route('pedido.formulario') }}" class="btn btn-success mt-3">Finalizar Pedido</a>
-        @endif
-    </div>
-</section>
+                    </tfoot>
+                </table>
+            </div>
+        </div>
 
-</body>
-</html>
+        <div class="btn-actions">
+            <a href="/catalogo" class="btn btn-checkout-secondary">Continuar Comprando</a>
+            <a href="{{ route('pedido.formulario') }}" class="btn btn-checkout">Finalizar Pedido</a>
+        </div>
+    @endif
+</div>
+@endsection

@@ -53,7 +53,7 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/pedidos/{id}/atualizar', [PedidoController::class, 'atualizar'])->name('pedidos.atualizar');
     Route::get('/pedidos/historico', [PedidoController::class, 'historico'])->name('pedidos.historico');
     Route::get('/pedidos/criar', [PedidoController::class, 'formularioCriar'])->name('pedido.criar'); // Para exibir o formulário
-Route::post('/pedidos/criar', [PedidoController::class, 'criarPedidos'])->name('pedidos.salvar'); // Para salvar os dados
+    Route::post('/pedidos/criar', [PedidoController::class, 'criarPedidos'])->name('pedidos.salvar'); // Para salvar os dados
 
 });
 

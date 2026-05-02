@@ -17,7 +17,7 @@
         </div>
     @endif
 
-    <form action="{{ route('pedido.salvar') }}" method="POST" class="checkout-form">
+    <form action="{{ route('pedido.salvar') }}" method="POST" class="checkout-form" enctype="multipart/form-data">
         @csrf
 
         <!-- Seção de Dados do Cliente -->
@@ -136,6 +136,11 @@
             </div>
         </div>
 
+        <div class="form-group">
+            <label for="foto">Foto de Inspiração (opcional):</label>
+            <input type="file" name="foto_inspiracao" id="foto" accept="image/*">
+        </div>
+        
         <!-- Seção de Itens do Pedido -->
         <div class="pedido-itens-section">
             <h3>Itens do Pedido</h3>

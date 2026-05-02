@@ -9,6 +9,7 @@ use App\Models\ProdutoConfiguracao;
 use App\Models\ItemCarrinho;
 use App\Models\Produtos;
 use Illuminate\Http\Request;
+use CloudinaryLabs\CloudinaryLaravel\Facades\Cloudinary;
 
 
 class PedidoController extends Controller
@@ -29,6 +30,7 @@ class PedidoController extends Controller
     {
         $request->validate([
             'nome_cliente' => 'required|string|max:255',
+            'telefone' => 'required|string|max:15',
             'tipo_entrega' => 'required|in:entrega,retirada',
             'data_entrega' => [
                 'required',
@@ -95,7 +97,20 @@ class PedidoController extends Controller
                 'configuracoes' => $configuracoes
             ];
         })->toArray();
-
+            
+        // CLOUDINARY
+        $fotoUrl = null;
+        if ($request->hasFile('foto_inspiracao')) {
+            $upload = Cloudinary::upload($request->file('foto_inspiracao')->getRealPath(), [
+                'folder' => 'bolos_inspiracao',
+                'transformation' => [
+                    'quality' => 'auto',
+                    'fetch_format' => 'auto'
+                ]
+            ]);
+            $fotoUrl = $upload->getSecurePath();
+        }
+    
         // Criar pedido
         $pedido = Pedido::create([
             'nome_cliente' => $request->nome_cliente,
@@ -107,9 +122,10 @@ class PedidoController extends Controller
             'numero' => $request->numero,
             'quadra' => $request->quadra,
             'lote' => $request->lote,
-            'numero_contato' => $request->numero_contato,
+            'numero_contato' => $request->telefone,
             'itens_pedido' => $itensPedido,
             'status' => 'pendente',
+            'foto_inspiracao' => $fotoUrl,
         ]);
 
         // Criar os itens do pedido na tabela pedido_itens
@@ -149,9 +165,11 @@ class PedidoController extends Controller
 
         $mensagem = "Olá, gostaria de fazer um pedido!\n"
             . "\nCliente: {$pedido->nome_cliente}\n"
+            . "Número para contato: {$pedido->numero_contato}\n"
             . "Data de Entrega: {$pedido->data_entrega}\n"
             . "Tipo de Entrega: " . ucfirst($pedido->tipo_entrega) . "\n"
             . "Total: R$ " . number_format($totalPedido, 2, ',', '.') . "\n"
+            . "Foto de Inspiração: " . ($pedido->foto_inspiracao ?? 'Não fornecida') . "\n"
             . "Itens do Pedido:\n";
 
         foreach ($itensPedido as $item) {
@@ -289,6 +307,19 @@ class PedidoController extends Controller
             'itens.*.quantidade' => 'required|integer|min:1',
         ]);
 
+        // CLOUDINARY
+        $fotoUrl = null;
+        if ($request->hasFile('foto_inspiracao')) {
+            $upload = Cloudinary::upload($request->file('foto_inspiracao')->getRealPath(), [
+                'folder' => 'bolos_inspiracao',
+                'transformation' => [
+                    'quality' => 'auto',
+                    'fetch_format' => 'auto'
+                ]
+            ]);
+            $fotoUrl = $upload->getSecurePath();
+        }
+
         // Preparar os itens do pedido para o campo JSON
         $itensPedido = collect($request->itens)->map(function ($item) {
             $produto = Produtos::find($item['produto_id']);
@@ -306,6 +337,7 @@ class PedidoController extends Controller
             'data_entrega' => $request->data_entrega,
             'numero_contato' => $request->numero_contato,
             'observacao' => $request->observacao ?? null,
+            'foto_inspiracao' => $fotoUrl,
             'itens_pedido' => $itensPedido,
             'status' => 'pendente',
         ]);
@@ -438,5 +470,6 @@ class PedidoController extends Controller
 
         return redirect()->route('pedidos.gerenciar')->with('success', 'Pedido atualizado com sucesso!');
     }
+
 
 }

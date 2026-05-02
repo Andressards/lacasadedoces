@@ -92,7 +92,7 @@ header {
 
 /* Cards de produto */
 .produto-card {
-    background-color: #a3e5ff;
+    background-color: #d1e4f8;
     color: #000000;
     padding: 20px;
     border-radius: 10px;
@@ -186,12 +186,29 @@ header {
     transition: 0.3s ease-in-out;
 }
 
+.form-busca a {
+    background-color: #6c757d;
+    color: #fff;
+    text-decoration: none;
+    padding: 8px 12px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: 0.3s ease-in-out;
+    display: inline-block;
+    text-align: center;
+}
+
 h1 {
     font-family: 'Dancing Script', cursive;
 }
 
-.form-busca button:hover {
+.form-busca button:hover, .form-busca a:hover {
     background-color: #6A2E0F; /* Tom mais escuro ao passar o mouse */
+}
+
+.form-busca a:hover {
+    background-color: #5a6268; /* Cinza mais escuro ao passar o mouse */
 }
 
 /* footer */
@@ -542,16 +559,22 @@ footer p {
 
     .form-busca {
         display: flex;
-        flex-direction: column; /* Input e botão empilhados */
+        flex-direction: row; /* Botões lado a lado em mobile */
         align-items: center;
-        gap: 10px;
-        max-width: 300px;
+        gap: 5px;
+        max-width: 100%;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    .form-busca input {
+        flex-basis: 100%; /* Input ocupa a linha inteira */
         width: 100%;
     }
 
-    .form-busca input,
-    .form-busca button {
-        width: 100%;
+    .form-busca button, .form-busca a {
+        flex: 1;
+        min-width: 80px;
     }
 
 }

@@ -6,7 +6,7 @@
         <h1 class="titulo-form" id="titulo-form-membro">Gerenciar Pedido</h1>
     </div>
 
-    <form action="{{ route('pedidos.atualizar', ['id' => $pedido->id]) }}" method="POST">
+    <form action="{{ route('pedidos.atualizar', ['id' => $pedido->id]) }}" method="POST" enctype="multipart/form-data">
         @csrf
 
         <div class="mb-3">
@@ -68,7 +68,29 @@
                 <label for="cep" class="form-label">CEP</label>
                 <input type="number" name="cep" id="cep" class="form-control" value="{{ $pedido->cep }}">
             </div>
-        </div> 
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Imagem Atual</label>
+            <div class="image-preview mb-2">
+                @if($pedido->foto_inspiracao)
+                    @php
+                        // Verifica se o que está no banco já é uma URL completa
+                        $isUrl = str_contains($pedido->foto_inspiracao, 'http');
+                        $urlImagem = $isUrl ? $pedido->foto_inspiracao : asset('storage/' . $pedido->foto_inspiracao);
+                    @endphp
+
+                    <img src="{{ $urlImagem }}" 
+                        alt="Preview" 
+                        style="max-width: 200px; border-radius: 8px; border: 1px solid #ddd;">
+                @else
+                    <p class="text-muted">Nenhuma imagem cadastrada.</p>
+                @endif
+            </div>
+
+            <label for="image" class="form-label">Alterar Imagem</label>
+            <input type="file" name="image" id="image" class="form-control">
+        </div>
 
         <h4>Itens do Pedido</h4>
         <div class="table-responsive mb-3">

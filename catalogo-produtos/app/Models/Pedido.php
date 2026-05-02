@@ -22,6 +22,7 @@ class Pedido extends Model
         'numero_contato',
         'itens_pedido',
         'status',
+        'foto_inspiracao'
     ];
     
     protected $casts = [
